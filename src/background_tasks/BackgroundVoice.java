@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
+import mainview.MediaPlayer;
+
 /**
  * Creates a voice that runs in the background which can be canceled
  * 
@@ -19,6 +21,7 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 	// Instance variables
 	private String message; // message to be said
 	private int pid; // task id
+	private MediaPlayer mediaPlayer=null;
 
 	/**
 	 * default constructor
@@ -31,8 +34,9 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 	 * 
 	 * @param message message that the user provides
 	 */
-	public BackgroundVoice(String message) {
+	public BackgroundVoice(String message, MediaPlayer mediaPlayer) {
 		this.message = message;
+		this.mediaPlayer=mediaPlayer;
 	}
 
 	/**
@@ -107,7 +111,8 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 		} catch (ExecutionException e1) {
 			// TODO Auto-generated catch block
 		}
-
+		this.mediaPlayer.getSpeakButton().setText("");
+		this.mediaPlayer.getSpeakButton().setIcon(mediaPlayer.getSpeakIcon());
 	}
 
 }
