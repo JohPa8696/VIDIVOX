@@ -15,6 +15,7 @@ import javax.swing.JSlider;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import add_mp3_file.AddMp3FileFrame;
 import background_tasks.BackgroundVoice;
@@ -36,6 +37,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -61,14 +63,12 @@ public class MediaPlayer extends JFrame implements ActionListener,
 	private final ImageIcon stopIcon = new ImageIcon(
 			MediaPlayer.class.getResource("/javagui/resources/stop.png"));
 	private final ImageIcon saveIcon = new ImageIcon(
-			MediaPlayer.class.getResource("/javagui/resources/save2.png"));
+			MediaPlayer.class.getResource("/javagui/resources/Save1.png"));
 	private final ImageIcon speakIcon = new ImageIcon(
-			MediaPlayer.class.getResource("/javagui/resources/speak.png"));
+			MediaPlayer.class.getResource("/javagui/resources/Speak2.png"));
 	private final ImageIcon fileIcon = new ImageIcon(
 			MediaPlayer.class.getResource("/javagui/resources/openfile.png"));
 
-	private JTextField text = new JTextField();
-	private final JLabel volumelbl = new JLabel();
 	private final JPanel contentPane = new JPanel();;
 	private final JPanel screen = new JPanel();
 	private final JPanel controls = new JPanel();
@@ -80,17 +80,22 @@ public class MediaPlayer extends JFrame implements ActionListener,
 	private final JButton backward = new JButton("");
 	private final JButton volume = new JButton("");
 	private final JButton speak = new JButton("");
-	private final JButton cancel = new JButton("Cancel");
 	private final JButton save = new JButton("");
-	private final JButton openFile = new JButton("");
-	private final JButton addCommentary = new JButton("Add");
-	private JButton create = new JButton("Create");
-	private JButton option = new JButton("Options");
+	private final JButton create = new JButton("Create");
+	private final JButton option = new JButton("Options");
+	
 	private final JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
-	private JLabel statuslbl = new JLabel();
-	private JLabel time = new JLabel();
-
-	private Timer timer = new Timer(200, this);
+	
+	private final JLabel statuslbl = new JLabel();
+	private final JLabel volumelbl = new JLabel();
+	private final JLabel ratelbl= new JLabel("Rate");
+	private final JLabel pitchlbl= new JLabel("Pitch");
+	private final JLabel time = new JLabel();
+	private final JTextField text = new JTextField();
+	
+	private JFileChooser fileChooser = null;
+	
+	private final Timer timer = new Timer(200, this);
 	private int minute = 0;
 	private int second = 0;
 
@@ -99,8 +104,6 @@ public class MediaPlayer extends JFrame implements ActionListener,
 	private BackgroundVoice bg = null;
 	private SkipBackground sg = null;
 	private AddMp3FileFrame amff = null;
-	private BrowseFileFrame bf1 = null;
-	private BrowseFileFrame bf2 = null;
 	private MessageFrame mf = null;
 
 	private final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
@@ -176,6 +179,7 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		play.setIcon(playIcon);
 		controls.add(play);
 		play.addActionListener(this);
+		play.setEnabled(false);
 		
 
 		// Forward button
@@ -183,14 +187,15 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		forward.setBounds(490, 30, 80, 55);
 		controls.add(forward);
 		forward.addActionListener(this);
-		
+		forward.setEnabled(false);
 
 		// Backward button
 		backward.setIcon(backwardIcon);
 		backward.setBounds(290, 30, 80, 55);
 		controls.add(backward);
 		backward.addActionListener(this);
-
+		backward.setEnabled(false);
+		
 		// volume label
 		volumelbl.setBounds(600, 30, 48, 60);
 		volumelbl.setIcon(volumeIcon);
@@ -204,6 +209,7 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		slider.setPaintTicks(true);
 		slider.addChangeListener(this);
 		controls.add(slider);
+	
 		
 		//Option button
 		option.setBackground(new Color(250, 250, 250));
@@ -214,67 +220,51 @@ public class MediaPlayer extends JFrame implements ActionListener,
 
 		// Speech panel
 		speech.setBackground(new Color(255, 255, 255));
-		speech.setBounds(0, 700, 880, 80);
+		speech.setBounds(0, 700, 880, 140);
 		contentPane.add(speech);
 		speech.setLayout(null);
 
+		//Rate label
+		ratelbl.setFont(new Font("Time New Roman", Font.PLAIN, 16));
+		ratelbl.setBounds(220, 15, 50, 25);
+		speech.add(ratelbl);
+		//Pitch Label
+		pitchlbl.setFont(new Font("Time New Roman", Font.PLAIN, 16));
+		pitchlbl.setBounds(335,15,50,25);
+		speech.add(pitchlbl);
 		// input field
-		text = new JTextField();
-		text.setFont(new Font("Book Antiqua", Font.PLAIN, 18));
-		text.setBounds(200, 10, 560, 30);
+		text.setFont(new Font("Time New Roman", Font.PLAIN, 18));
+		text.setBounds(200, 65, 560, 30);
 		speech.add(text);
 		text.setColumns(10);
-
+		
 		// Speak button
-		speak.setBounds(40, 5, 65, 40);
+		speak.setBounds(40, 60, 65, 40);
 		speak.setBackground(new Color(0, 0, 0));
 		speak.setToolTipText("Speak the text in the text box");
 		speak.setIcon(speakIcon);
 		speech.add(speak);
 		speak.addActionListener(this);
-
-		// Cancel button
-		cancel.setBounds(530, 40, 65, 40);
-		cancel.setForeground(SystemColor.textHighlight);
-		cancel.setFont(new Font("Tahoma", Font.BOLD, 10));
-		cancel.setToolTipText("Cancel the speech");
-		//speech.add(cancel);
-		cancel.addActionListener(this);
+		speak.setEnabled(false);
 
 		// save text button
-		save.setBounds(117, 5, 65, 40);
+		save.setBounds(117, 60, 65, 40);
 		save.setToolTipText("Save the synthetic speech");
 		save.setIcon(saveIcon);
 		speech.add(save);
 		save.addActionListener(this);
-
-		/*Open file button
-		openFile.setBounds(445, 40, 65, 40);
-		openFile.setToolTipText("Select an audio file and a video file and merge them");
-		openFile.setIcon(fileIcon);
-		speech.add(openFile);
-		openFile.addActionListener(this); */
-
-		// Add comment button
-		addCommentary.setBounds(190, 40, 65, 40);
-		addCommentary.setFont(new Font("Tahoma", Font.BOLD, 10));
-		addCommentary.setToolTipText("Add text to the video");
-		//speech.add(addCommentary);
-		addCommentary.addActionListener(this);
-		statuslbl.setBackground(new Color(0, 0, 0));
+		save.setEnabled(false);
 
 		// status of file being created
-		statuslbl.setBounds(240, 45, 400, 35);
-		statuslbl.setFont(new Font("Time New Roman", Font.BOLD,
-				15));
-		//statuslbl.setText("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaqqqqqqqqqqqqqq");
+		statuslbl.setBounds(240, 100, 400, 35);
+		statuslbl.setFont(new Font("Time New Roman", Font.BOLD,15));
 		statuslbl.setForeground(new Color(0, 0, 0));
 		statuslbl.setVisible(true);
 		speech.add(statuslbl);
 		
 		// Create button opens new frame and let user create a video file
 		create.setBackground(new Color(0, 0, 0));
-		create.setBounds(780, 5, 65, 40);
+		create.setBounds(780, 60, 65, 40);
 		create.setToolTipText("Open the Creating Video Tools Window");
 		speech.add(create);
 		create.addActionListener(this);
@@ -283,7 +273,7 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		setIconImage(Toolkit.getDefaultToolkit().getImage(
 				MediaPlayer.class.getResource("/javagui/resources/logo.jpg")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 880, 780);
+		setBounds(100, 100, 880, 830);
 		setContentPane(contentPane);
 		setVisible(true);
 
@@ -326,15 +316,16 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		} else if (video.isPlaying()) {
 			play.setIcon(stopIcon);
 		}
+		//If the textField is not empty enable speak and save buttons
+		if(!text.getText().trim().equals("")){
+			speak.setEnabled(true);
+			save.setEnabled(true);
+		}else{
+			speak.setEnabled(false);
+			save.setEnabled(false);
+		}
 		if (e.getSource() == pickVideoFile) {
-			if (bf1 != null) {
-				bf1.dispose();
-			}
-			bf1 = new BrowseFileFrame("Open Video File", "Select a video file");
-			bf1.addMediaPlayer(this);
-			bf1.addCurrentVideo(videoTitle);
-			bf1.setVisible(true);
-
+			fileChooserInit();
 		} else if (e.getSource()==option){
 			if(op!=null){
 				op.setVisible(true);
@@ -342,9 +333,6 @@ public class MediaPlayer extends JFrame implements ActionListener,
 				op= new OptionsFrame();
 				op.setMediaPlayer(this);
 			}
-		
-		
-		
 		} else if (e.getSource() == play) {
 			if (videoTitle == null) {
 				if (mf != null) {
@@ -420,7 +408,6 @@ public class MediaPlayer extends JFrame implements ActionListener,
 			ssf = new SaveSpeechFrame();
 			ssf.setVisible(true);
 			ssf.setSpeech(text.getText());
-			System.out.println(wordCount());
 		} else if (e.getSource() == create) {
 			if (amff != null) {
 				amff.dispose();
@@ -431,23 +418,6 @@ public class MediaPlayer extends JFrame implements ActionListener,
 			amff.setVisible(true);
 			amff.addMediaPlayer(this);
 			amff.addCurrentVideo(videoTitle);
-		} else if (e.getSource() == addCommentary) {
-			if (text.getText().equals("")) {
-				if (mf != null) {
-					mf.dispose();
-				}
-				mf = new MessageFrame("Error", "ERROR",
-						"Text field must not be empty!");
-				mf.setVisible(true);
-				return;
-			} else if (bf2 != null) {
-				bf2.dispose();
-			}
-			bf2 = new BrowseFileFrame("Add Text to Video",
-					"Fill in blank fields");
-			bf2.addMediaPlayer(this);
-			bf2.addCurrentVideo(videoTitle);
-			bf2.setVisible(true);
 		}
 	}
 
@@ -498,14 +468,42 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		return this.speak;
 	}
 	// get the speak Icon
-		public ImageIcon getSpeakIcon(){
-			return this.speakIcon;
-		}
+	public ImageIcon getSpeakIcon(){
+		return this.speakIcon;
+	}
 	// counts number of words in the text field
 	public int wordCount() {
 		String speechText = text.getText().trim();
 		if (speechText.isEmpty())
 			return 0;
 		return speechText.split("\\s+").length; // separate string around spaces
+	}
+	
+	//Enable control button
+	public void enableButtons(){
+		play.setEnabled(true);
+		forward.setEnabled(true);
+		backward.setEnabled(true);
+	}
+	
+	// Initialise filechooser when User click the open button
+	public void fileChooserInit(){
+		if (fileChooser == null) {
+			fileChooser = new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter(
+					"Media File", "avi", "mp4", "mkv");
+			fileChooser.setCurrentDirectory(new java.io.File("."));
+			fileChooser
+					.setDialogTitle("Open Video File");
+			fileChooser
+					.setFileFilter((javax.swing.filechooser.FileFilter) filter);
+			fileChooser.setAcceptAllFileFilterUsed(false);
+			if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+				setVideoTitle(fileChooser.getSelectedFile().toString());
+				playVideo();
+				enableButtons();
+			}
+			fileChooser = null;
+		}
 	}
 }

@@ -9,10 +9,22 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import mainview.MediaPlayer;
+import sun.audio.AudioData;
+import sun.audio.AudioDataStream;
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
+import sun.audio.ContinuousAudioDataStream;
+
 import javax.swing.JLabel;
 import java.awt.Font;
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.awt.event.ActionEvent;
 
@@ -20,8 +32,16 @@ public class MessageFrame extends JFrame {
 
 	private JPanel contentPane;
 	private JFrame thisFrame = this;
-	private JLabel errorTitle = new JLabel();
-	
+	private JLabel errorLabel = new JLabel();
+	private final ImageIcon ErrorIcon1 = new ImageIcon(
+			MediaPlayer.class.getResource("/javagui/resources/Error1.png"));
+	private final ImageIcon ErrorIcon2 = new ImageIcon(
+			MediaPlayer.class.getResource("/javagui/resources/Error2.png"));
+	private AudioPlayer audioPlayer= AudioPlayer.player;
+	private AudioStream inputStream;
+	private AudioData data;
+	private AudioDataStream stream=null;
+	private ContinuousAudioDataStream loop=null;
 	//private URL url= MessageFrame.class.getClassLoader().getResource("notification.wav");
 	//private AudioClip notification= Applet.newAudioClip(url);
 	
@@ -55,6 +75,7 @@ public class MessageFrame extends JFrame {
 		setBounds(100, 100, 450, 201);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBackground(new Color(255,255,255));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		//notification.play();
@@ -85,6 +106,7 @@ public class MessageFrame extends JFrame {
 	 * @param messageText	the message to the user
 	 */
 	public MessageFrame(String frameTitle, String messageTitle, String messageText) {
+		notification();
 		setBounds(658, 605, 320, 120);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -93,14 +115,16 @@ public class MessageFrame extends JFrame {
 		thisFrame.setUndecorated(true);
 		thisFrame.setOpacity(0.6F);
 		thisFrame.setBackground(new Color(255,255,255));
+		contentPane.setBackground(new Color(255,255,255));
 		contentPane.setLayout(null);
 		
 		// title of the message
-		errorTitle.setFont(new Font("Dialog", Font.BOLD, 18));
-		errorTitle.setBounds(10, 5, 100, 60);
-		errorTitle.setForeground(Color.RED);
-		errorTitle.setText(messageTitle);
-		contentPane.add(errorTitle);
+		errorLabel.setFont(new Font("Dialog", Font.BOLD, 18));
+		errorLabel.setBounds(10, 5, 200, 60);
+		errorLabel.setIcon(ErrorIcon1);
+		errorLabel.setForeground(Color.RED);
+		errorLabel.setText(messageTitle);
+		contentPane.add(errorLabel);
 		
 		//message to give to user
 		JLabel message = new JLabel(messageText);
@@ -110,6 +134,7 @@ public class MessageFrame extends JFrame {
 		JButton okButton = new JButton("OK");
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				audioPlayer.stop(loop);
 				thisFrame.dispose();
 			}
 		});
@@ -118,6 +143,20 @@ public class MessageFrame extends JFrame {
 	}
 	
 	public String getErrorTile(){
-		return this.errorTitle.getText();
+		return this.errorLabel.getText();
+	}
+	
+	//Play the notification sound
+	public void notification(){
+		try{
+			inputStream = new AudioStream(new FileInputStream(".notification.wav"));
+			data= inputStream.getData();
+			//stream=	new AudioDataStream(data); 
+			loop= new ContinuousAudioDataStream(data);
+			//audioPlayer.start(stream);
+			audioPlayer.start(loop);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 }

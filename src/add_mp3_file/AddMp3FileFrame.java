@@ -3,6 +3,7 @@ package add_mp3_file;
 import generic_frames.MessageFrame;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.JColorChooser;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import javax.swing.JCheckBox;
 
 import mainview.MediaPlayer;
+import save_speech.SaveSpeechFrame;
 
 public class AddMp3FileFrame extends JFrame {
 
@@ -46,14 +48,29 @@ public class AddMp3FileFrame extends JFrame {
 	private MediaPlayer mediaPlayer = null;
 	private MessageFrame mf = null;
 
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					AddMp3FileFrame window = new AddMp3FileFrame();
+					window.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 	/**
 	 * Create the frame.
 	 */
 	public AddMp3FileFrame() {
 		setTitle("Add an mp3 file");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 450, 350);
+		setBounds(981, 100, 450, 830);
+		
+		//contentPane
 		contentPane = new JPanel();
+		contentPane.setBackground(new Color(255,255,255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
