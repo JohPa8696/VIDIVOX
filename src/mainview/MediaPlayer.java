@@ -47,6 +47,11 @@ import java.awt.Font;
 import java.awt.SystemColor;
 
 import javax.swing.SwingConstants;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerListModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 public class MediaPlayer extends JFrame implements ActionListener,
 		ChangeListener {
@@ -85,15 +90,19 @@ public class MediaPlayer extends JFrame implements ActionListener,
 	private final JButton option = new JButton("Options");
 	
 	private final JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
-	
+	private final JSpinner startPitchSpnr = new JSpinner();
+	private final JSpinner endPitchSpnr = new JSpinner();
+	private JSpinner rateSpnr = new JSpinner( new SpinnerNumberModel(new Double(1.5),new Double(0.1),new Double(5.0),new Double(0.1)));
 	private final JLabel statuslbl = new JLabel();
 	private final JLabel volumelbl = new JLabel();
+	private final JLabel voicelbl = new JLabel("Voice");
 	private final JLabel ratelbl= new JLabel("Rate");
 	private final JLabel pitchlbl= new JLabel("Pitch");
 	private final JLabel time = new JLabel();
 	private final JTextField text = new JTextField();
 	
 	private JFileChooser fileChooser = null;
+	private JComboBox<?> comboBox = new JComboBox();
 	
 	private final Timer timer = new Timer(200, this);
 	private int minute = 0;
@@ -107,10 +116,12 @@ public class MediaPlayer extends JFrame implements ActionListener,
 	private MessageFrame mf = null;
 
 	private final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
-	private final EmbeddedMediaPlayer video = mediaPlayerComponent
-			.getMediaPlayer();
-
+	private final EmbeddedMediaPlayer video = mediaPlayerComponent.getMediaPlayer();
+	
+	private final String[] pitchRange={"50 hz", "60 hz", "70 hz", "80 hz", "90 hz", "100 hz", "110 hz", "120 hz", "130 hz", "140 hz", 
+							"150 hz", "160 hz", "170 hz", "180 hz", "190 hz", "200 hz", "210 hz", "220 hz", "230 hz", "240 hz", "250 hz"};
 	private String videoTitle = null;
+	
 
 	/**
 	 * Launch the application.
@@ -223,15 +234,23 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		speech.setBounds(0, 700, 880, 140);
 		contentPane.add(speech);
 		speech.setLayout(null);
-
+		
+		
+		//Voice label
+		voicelbl.setFont(new Font("Time New Roman", Font.PLAIN, 16));
+		voicelbl.setBounds(220, 15, 50, 25);
+		speech.add(voicelbl);
+		
 		//Rate label
 		ratelbl.setFont(new Font("Time New Roman", Font.PLAIN, 16));
-		ratelbl.setBounds(220, 15, 50, 25);
+		ratelbl.setBounds(400, 15, 50, 25);
 		speech.add(ratelbl);
+		
 		//Pitch Label
 		pitchlbl.setFont(new Font("Time New Roman", Font.PLAIN, 16));
-		pitchlbl.setBounds(335,15,50,25);
+		pitchlbl.setBounds(525,15,50,25);
 		speech.add(pitchlbl);
+		
 		// input field
 		text.setFont(new Font("Time New Roman", Font.PLAIN, 18));
 		text.setBounds(200, 65, 560, 30);
@@ -267,6 +286,29 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		create.setBounds(780, 60, 65, 40);
 		create.setToolTipText("Open the Creating Video Tools Window");
 		speech.add(create);
+		
+		//rate spinner
+		rateSpnr.setBounds(455, 15, 60, 25);
+		rateSpnr.setToolTipText("Set rate for speech");
+		speech.add(rateSpnr);
+		
+		// start pitch
+		startPitchSpnr.setModel(new SpinnerListModel(pitchRange));
+		startPitchSpnr.setBounds(580, 15, 80, 25);
+		startPitchSpnr.setToolTipText("set start pitch of the speech");
+		speech.add(startPitchSpnr);
+		
+		//end pitch
+		endPitchSpnr.setModel(new SpinnerListModel(pitchRange));
+		endPitchSpnr.setBounds(670, 15, 80, 25);
+		endPitchSpnr.setToolTipText("set end pitch of the speech");
+		speech.add(endPitchSpnr);
+		
+		// COmbo box for choosing voice
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Male", "Female", "New Zealand"}));
+		comboBox.setBounds(275, 15, 100, 25);
+		comboBox.setToolTipText("select voice for speech");
+		speech.add(comboBox);
 		create.addActionListener(this);
 
 		// set Frame
@@ -324,16 +366,18 @@ public class MediaPlayer extends JFrame implements ActionListener,
 			speak.setEnabled(false);
 			save.setEnabled(false);
 		}
-		if (e.getSource() == pickVideoFile) {
+		
+		// Buttons action perform
+		if (e.getSource() == pickVideoFile) {  //Open a video file
 			fileChooserInit();
-		} else if (e.getSource()==option){
+		} else if (e.getSource()==option){	   // Option frame, choose Rate and mode
 			if(op!=null){
 				op.setVisible(true);
 			}else{
 				op= new OptionsFrame();
 				op.setMediaPlayer(this);
 			}
-		} else if (e.getSource() == play) {
+		} else if (e.getSource() == play) { 	// Play the video
 			if (videoTitle == null) {
 				if (mf != null) {
 					mf.dispose();
@@ -353,7 +397,7 @@ public class MediaPlayer extends JFrame implements ActionListener,
 				play.setIcon(playIcon);
 				video.pause();
 			}
-		} else if (e.getSource() == forward) {
+		} else if (e.getSource() == forward) {	// Fast forward
 			if (sg != null) {
 				sg.cancel(true);
 				sg = null;
@@ -361,15 +405,15 @@ public class MediaPlayer extends JFrame implements ActionListener,
 			sg = new SkipBackground(true, video);
 			sg.execute();
 
-		} else if (e.getSource() == backward) {
+		} else if (e.getSource() == backward) {	// backward
 			if (sg != null) {
 				sg.cancel(true);
 				sg = null;
 			}
 			sg = new SkipBackground(false, video);
 			sg.execute();
-
-		} else if (e.getSource() == speak) {
+			
+		} else if (e.getSource() == speak) {		// festival, speak
 			if(bg!=null&&!bg.isDone()){
 				bg.cancel(true);
 				bg=null;
@@ -385,12 +429,12 @@ public class MediaPlayer extends JFrame implements ActionListener,
 				speak.setIcon(null);
 				speak.setText("Cancel");
 			}
-		} else if (e.getSource() == save) {
+		} else if (e.getSource() == save) {			// Save the synthetic speech in an mp3 file
 			if (wordCount() > 30) {
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR", "Word count is: "
+				mf = new MessageFrame("Error", "ERROR 7", "Word count is: "
 						+ wordCount() + ". Must be less than 30 words.");
 				mf.setVisible(true);
 				return;
@@ -398,7 +442,7 @@ public class MediaPlayer extends JFrame implements ActionListener,
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR",
+				mf = new MessageFrame("Error", "ERROR 1",
 						"Text field must not be empty!");
 				mf.setVisible(true);
 				return;
@@ -408,7 +452,7 @@ public class MediaPlayer extends JFrame implements ActionListener,
 			ssf = new SaveSpeechFrame();
 			ssf.setVisible(true);
 			ssf.setSpeech(text.getText());
-		} else if (e.getSource() == create) {
+		} else if (e.getSource() == create) {		// Open Create window with tools
 			if (amff != null) {
 				amff.dispose();
 			}
