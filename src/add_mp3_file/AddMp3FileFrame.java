@@ -70,6 +70,7 @@ public class AddMp3FileFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public AddMp3FileFrame() {
+		//set up the frame
 		setTitle("Add an mp3 file");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(981, 100, 420, 830);
@@ -194,7 +195,6 @@ public class AddMp3FileFrame extends JFrame {
 		try {
 			saveToText.setText(new java.io.File(".").getCanonicalPath());
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
