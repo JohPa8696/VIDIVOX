@@ -149,12 +149,12 @@ public class MessageFrame extends JFrame {
 	//Play the notification sound
 	public void notification(){
 		try{
-			inputStream = new AudioStream(new FileInputStream(".notification.wav"));
+			inputStream = new AudioStream(new FileInputStream(".notification1.wav"));
 			data= inputStream.getData();
-			//stream=	new AudioDataStream(data); 
-			loop= new ContinuousAudioDataStream(data);
-			//audioPlayer.start(stream);
-			audioPlayer.start(loop);
+			stream=	new AudioDataStream(data); 
+			//loop= new ContinuousAudioDataStream(data);
+			audioPlayer.start(stream);
+			//audioPlayer.start(loop);
 		}catch(IOException e){
 			e.printStackTrace();
 		}

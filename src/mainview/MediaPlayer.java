@@ -19,6 +19,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import add_mp3_file.AddMp3FileFrame;
 import background_tasks.BackgroundVoice;
+import background_tasks.GetMediaFileDurationTask;
 import background_tasks.SkipBackground;
 
 import com.sun.jna.Native;
@@ -105,7 +106,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private final JButton volume = new JButton("");
 	private final JButton speak = new JButton("");
 	private final JButton save = new JButton("");
-	private final JButton create = new JButton("Merge");
+	private final JButton create = new JButton("Hide");
 	private final JButton option = new JButton("Options");
 	private final JButton mp3Browse = new JButton("Browse");
 	private final JButton videoBrowse = new JButton("Browse");
@@ -683,7 +684,6 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			minute = 0;
 			time.setText("00:00:00");
 		}
-
 		// If there is video playing set the play button with the stop icon or
 		// otherwise.
 		if (video.getTime() == video.getLength() || !video.isPlaying()) {
@@ -790,7 +790,17 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			ssf.setVisible(true);
 			ssf.setSpeech(text.getText());
 		} else if (e.getSource() == create) {		// Open Create window with tools
-			if (amff != null) {
+			
+			if(create.getText().equals("Hide")){
+				mergeAudio.setVisible(false);
+				this.setBounds(100, 100, 880, 830);
+				create.setText("Show");
+			}else{
+				mergeAudio.setVisible(true);
+				this.setBounds(100, 100, 1330, 830);
+				create.setText("Hide");
+			}
+			/*if (amff != null) {
 				amff.dispose();
 			}
 			amff = new AddMp3FileFrame();
@@ -799,6 +809,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			amff.setVisible(true);
 			amff.addMediaPlayer(this);
 			amff.addCurrentVideo(videoTitle);
+			*/
 		} else if(e.getSource() == videoBrowse){
 			fileChooserInit("Video",videoBrowse);
 		}else if(e.getSource() == mp3Browse){
@@ -904,15 +915,24 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			
 			if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 				setVideoTitle(chooser.getSelectedFile().toString());
+				GetMediaFileDurationTask durationTask;
 				if(clickedButton.equals(openVideo)){
 					playVideo();
 					enableButtons();
 					addCurrentVideo(videoTitle);
+					
+					durationTask= new GetMediaFileDurationTask(videoTitle,videoDuration);
+					durationTask.execute();
 				}else if(clickedButton.equals(videoBrowse)){
 					videoFiletf.setText(chooser.getSelectedFile().toString());
+					 durationTask= new GetMediaFileDurationTask(videoTitle,videoDuration);
+					 durationTask.execute();
 				}else{
 					mp3Filetf.setText(chooser.getSelectedFile().toString());
+					 durationTask= new GetMediaFileDurationTask(videoTitle,mp3Duration);
+					 durationTask.execute();
 				}
+				durationTask=null;
 			}
 			chooser = null;
 		}

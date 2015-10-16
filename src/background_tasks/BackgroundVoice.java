@@ -124,16 +124,13 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 				builder3.start();
 				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
 		} catch (ExecutionException e1) {
-			// TODO Auto-generated catch block
 		}
 		this.mediaPlayer.getSpeakButton().setText("");
 		this.mediaPlayer.getSpeakButton().setIcon(mediaPlayer.getSpeakIcon());
