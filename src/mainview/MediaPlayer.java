@@ -71,22 +71,22 @@ public class MediaPlayer extends JFrame implements ActionListener,
 			MediaPlayer.class.getResource("/javagui/resources/Save1.png"));
 	private final ImageIcon speakIcon = new ImageIcon(
 			MediaPlayer.class.getResource("/javagui/resources/Speak2.png"));
-	private final ImageIcon fileIcon = new ImageIcon(
-			MediaPlayer.class.getResource("/javagui/resources/openfile.png"));
+	private final ImageIcon muteIcon = new ImageIcon(
+			MediaPlayer.class.getResource("/javagui/resources/Mute1.png"));
 
 	private final JPanel contentPane = new JPanel();;
 	private final JPanel screen = new JPanel();
 	private final JPanel controls = new JPanel();
 	private final JPanel speech = new JPanel();
 
-	private final JButton pickVideoFile = new JButton("");
+	private final JButton openVideo = new JButton("");
 	private final JButton play = new JButton("");
 	private final JButton forward = new JButton("");
 	private final JButton backward = new JButton("");
 	private final JButton volume = new JButton("");
 	private final JButton speak = new JButton("");
 	private final JButton save = new JButton("");
-	private final JButton create = new JButton("Create");
+	private final JButton create = new JButton("Merge");
 	private final JButton option = new JButton("Options");
 	
 	private final JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
@@ -102,7 +102,7 @@ public class MediaPlayer extends JFrame implements ActionListener,
 	private final JTextField text = new JTextField();
 	
 	private JFileChooser fileChooser = null;
-	private JComboBox<?> comboBox = new JComboBox();
+	private JComboBox<?> voiceOptions = new JComboBox();
 	
 	private final Timer timer = new Timer(200, this);
 	private int minute = 0;
@@ -178,11 +178,11 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		
 
 		// pick a video file to play
-		pickVideoFile.setBounds(40, 40, 65, 40);
-		pickVideoFile.setText("Open");
-		pickVideoFile.setToolTipText("Open a Video File");
-		pickVideoFile.addActionListener(this);
-		controls.add(pickVideoFile);
+		openVideo.setBounds(40, 40, 65, 40);
+		openVideo.setText("Open");
+		openVideo.setToolTipText("Open a Video File");
+		openVideo.addActionListener(this);
+		controls.add(openVideo);
 
 		
 		//Play button
@@ -224,7 +224,7 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		
 		//Option button
 		option.setBackground(new Color(250, 250, 250));
-		option.setBounds(117, 40, 65, 40);
+		option.setBounds(117, 40, 70, 40);
 		option.setToolTipText("Resize the Screen and Change the Speed of the Video");
 		controls.add(option);
 		option.addActionListener(this);
@@ -305,10 +305,10 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		speech.add(endPitchSpnr);
 		
 		// COmbo box for choosing voice
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Male", "Female", "New Zealand"}));
-		comboBox.setBounds(275, 15, 100, 25);
-		comboBox.setToolTipText("select voice for speech");
-		speech.add(comboBox);
+		voiceOptions.setModel(new DefaultComboBoxModel(new String[] {"Normal", "Auckland", "kal_diphone"}));
+		voiceOptions.setBounds(275, 15, 100, 25);
+		voiceOptions.setToolTipText("select voice for speech");
+		speech.add(voiceOptions);
 		create.addActionListener(this);
 
 		// set Frame
@@ -323,7 +323,9 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		timer.start();
 
 	}
-
+	/**
+	 * Perform tasks when users click buttons on the GUI 
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
@@ -368,7 +370,7 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		}
 		
 		// Buttons action perform
-		if (e.getSource() == pickVideoFile) {  //Open a video file
+		if (e.getSource() == openVideo) {  //Open a video file
 			fileChooserInit();
 		} else if (e.getSource()==option){	   // Option frame, choose Rate and mode
 			if(op!=null){
@@ -424,7 +426,11 @@ public class MediaPlayer extends JFrame implements ActionListener,
 			
 			if(!text.getText().trim().equals("")){
 				bg=null;
-				bg = new BackgroundVoice("echo " + text.getText(),this);
+				String start= (String) startPitchSpnr.getValue();
+				String startHz= start.substring(0, 3).trim();
+				String end= (String) endPitchSpnr.getValue();
+				String endHz= end.substring(0, 3).trim();
+				bg = new BackgroundVoice(text.getText(),this,(String)voiceOptions.getSelectedItem(), (double)rateSpnr.getValue(), Integer.parseInt(startHz),Integer.parseInt(endHz));
 				bg.execute();
 				speak.setIcon(null);
 				speak.setText("Cancel");
@@ -465,10 +471,17 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		}
 	}
 
-	// Volume control
+	/**
+	 * Change volume of the video when Jslider is moved.
+	 */
 	@Override
 	public void stateChanged(ChangeEvent arg0) {
 		video.setVolume(slider.getValue());
+		if (slider.getValue()==0){
+			volumelbl.setIcon(muteIcon);
+		}else{
+			volumelbl.setIcon(volumeIcon);
+		}
 	}
 
 	// set the video title
@@ -530,7 +543,9 @@ public class MediaPlayer extends JFrame implements ActionListener,
 		backward.setEnabled(true);
 	}
 	
-	// Initialise filechooser when User click the open button
+	/**
+	 * Initialise filechooser when User click the open button
+	 */
 	public void fileChooserInit(){
 		if (fileChooser == null) {
 			fileChooser = new JFileChooser();

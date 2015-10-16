@@ -14,14 +14,16 @@ import mainview.MediaPlayer;
 /**
  * Creates a voice that runs in the background which can be canceled
  * 
- * @author Vincent Nio
- * 
  */
 public class BackgroundVoice extends SwingWorker<Object, Integer> {
 	// Instance variables
 	private String message; // message to be said
 	private int pid; // task id
 	private MediaPlayer mediaPlayer=null;
+	private double rate;
+	private int pitchStart;
+	private int pitchEnd;
+	private String voice;
 
 	/**
 	 * default constructor
@@ -34,9 +36,13 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 	 * 
 	 * @param message message that the user provides
 	 */
-	public BackgroundVoice(String message, MediaPlayer mediaPlayer) {
+	public BackgroundVoice(String message, MediaPlayer mediaPlayer, String voice, double rate, int start,int end) {
 		this.message = message;
 		this.mediaPlayer=mediaPlayer;
+		this.rate= rate;
+		this.voice=voice;
+		this.pitchStart= start;
+		this.pitchEnd= end;
 	}
 
 	/**
@@ -44,28 +50,45 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 	 */
 	@Override
 	protected Object doInBackground() throws Exception {
-		// command string used in bash terminal
-		String cmd = message + " | festival --tts";
-
+		// create a scm file for festival.
+		String cmd = "if [ ! -f \\\".tmp.scm\\\" ] ; then $(touch .tmp.scm) ; fi";
 		// builds the command and runs it
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
 		Process process = builder.start();
-
-		// creates a reader to read the output
-		InputStream stdout = process.getInputStream();
-		BufferedReader stdoutBuffered = new BufferedReader(
-				new InputStreamReader(stdout));
-
+		process.waitFor();
+		process.destroy();
+		//Creating the commands to execute in the by festival 
+		String cmd1 = "echo -e \"(set! duffint_params '((start "+pitchStart+") (end "+pitchEnd+")))\n"
+				+ "(Parameter.set 'Int_Method 'DuffInt)\n(Parameter.set 'Int_Target_Method Int_Targets_Default)\n"
+				+ "(Parameter.set 'Duration_Stretch "+rate+")\n"
+				+ "(SayText \\\""+message+"\\\")\">.tmp.scm ";
+		
+		ProcessBuilder builder1= new ProcessBuilder("/bin/bash","-c", cmd1);
+		Process process1= builder1.start();
+		process1.waitFor();
+		process1.destroy();
+		
+		//Execute the scm file
+		String cmd2= "festival -b '.tmp.scm'";
+		ProcessBuilder builder2= new ProcessBuilder("/bin/bash","-c", cmd2);
+		Process process2= builder2.start();
+		
 		// gets task id of the process
-		Field f = process.getClass().getDeclaredField("pid");
+		Field f = process2.getClass().getDeclaredField("pid");
 		f.setAccessible(true);
 		// pid is private in UNIXProcess
-		int pid = f.getInt(process);
-		this.pid = pid;
-
+		this.pid= f.getInt(process2);
+	
+		process2.waitFor();
+		process2.destroy();
+		String cmd3= "rm -f .tmp.scm";
+		ProcessBuilder builder3= new ProcessBuilder("/bin/bash","-c", cmd3);
+		Process process3= builder3.start();
+		process3.waitFor();
+		process3.destroy();
 		// is needed so the function doesn't end early
-		while (stdoutBuffered.readLine() != null) {
-		}
+		//while (stdoutBuffered.readLine() != null) {
+		//}
 		return null;
 	}
 
@@ -86,6 +109,7 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 				BufferedReader stdoutBuffered2 = new BufferedReader(
 						new InputStreamReader(stdout2));
 				process2.waitFor();
+				Thread.sleep(200);
 
 				// gets the aplay pid from the output string
 				String line;
