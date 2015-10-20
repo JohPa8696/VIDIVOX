@@ -157,11 +157,11 @@ public class AddMp3FileFrame extends JFrame {
 					mf.setVisible(true);
 					return;
 				} else {
-					MergeAudioAndVideo amf = new MergeAudioAndVideo(mp3FileText.getText(),
-							videoFileText.getText(), newFile.getAbsolutePath(),
-							video, statuslbl, playVideoCheck.isSelected(),
-							mediaPlayer);
-					amf.execute();
+					//MergeAudioAndVideo amf = new MergeAudioAndVideo(mp3FileText.getText(),
+						//	videoFileText.getText(), newFile.getAbsolutePath(),
+							//video, statuslbl, playVideoCheck.isSelected(),
+							//mediaPlayer);
+					//amf.execute();
 				}
 				thisFrame.setVisible(false);
 				thisFrame.dispose();

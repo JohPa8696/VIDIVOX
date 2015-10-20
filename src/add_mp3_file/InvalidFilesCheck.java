@@ -13,10 +13,15 @@ public class InvalidFilesCheck {
 	private String videoFile;
 	private String newFile;
 	private String directory;
+	private String videoDuration;
+	private int minute;
+	private int second;
 	private MessageFrame mf=null;
-	private boolean isvalid1=true;
-	private boolean isvalid2=true;
+	private boolean isValid1=true;
+	private boolean isValid2=true;
+	private boolean isValid3=true;
 	private ArrayList<String> mp3Files= new ArrayList<String>();
+	private ArrayList<String> startTimes= new ArrayList<String>();
 	/**
 	 * Constructor with inputs are the file names entered by user
 	 * @param videoFile
@@ -36,6 +41,17 @@ public class InvalidFilesCheck {
 	 */
 	public InvalidFilesCheck(ArrayList<String> mp3Files){
 		this.mp3Files=mp3Files;
+	}
+	/**
+	 * Constructor take inputs as a array list of start times and the video duration that is being merge
+	 * @param startFiles
+	 * @param videoDuration
+	 */
+	public InvalidFilesCheck(ArrayList<String> startTimes, String videoDuration){
+		this.startTimes=startTimes;
+		this.videoDuration=videoDuration;
+		int minute=Integer.parseInt(videoDuration.substring(0,1));
+		int second=Integer.parseInt(videoDuration.substring(3,4));
 	}
 	/**
 	 * Check user inputs for name of new file, video file and the directory are valid.
@@ -86,11 +102,11 @@ public class InvalidFilesCheck {
 				}
 				mf = new MessageFrame("Error", "ERROR 5b", newFile.getName() + " is an invalid name");
 			}
-			isvalid1=false;
+			isValid1=false;
 			mf.setVisible(true);
 		}
 		
-		return isvalid1;	
+		return isValid1;	
 	}
 	/**
 	 * Check if the input mp3 files are valid or not
@@ -103,17 +119,64 @@ public class InvalidFilesCheck {
 				mf.dispose();
 				}
 				mf = new MessageFrame("Error", "ERROR 3b", mp3.getName() + " is a directory");
-				isvalid2=false;
+				isValid2=false;
 				mf.setVisible(true);
 			} else if (!mp3.exists()) {
 				if (mf != null) {
 					mf.dispose();
 				}	
 				mf = new MessageFrame("Error", "ERROR 2b", mp3.getName() + " does not exist");
-				isvalid2=false;
+				isValid2=false;
 				mf.setVisible(true);
 			}
 		}
-		return isvalid2;
+		return isValid2;
 	}
+	/**
+	 * Check if the starts are valid
+	 * @return
+	 */
+	public boolean startTimesCheck(){
+		for (String s: startTimes){
+			String[] substrings=s.split(":");
+			for(String substring: substrings){
+				if(isInteger(substring)){
+				}else{
+					if (mf != null) {
+						mf.dispose();
+					}
+					mf = new MessageFrame("Error", "ERROR 9", "Invalid start time");
+					isValid3=false;
+					mf.setVisible(true);
+					return isValid3;
+				}
+			}
+			int min=Integer.parseInt(s.substring(0,1));
+			int sec=Integer.parseInt(s.substring(3,4));
+			System.out.println(sec + "----" +min);
+			if((min*60 +sec)>(minute*60+second)){
+				if (mf != null) {
+					mf.dispose();
+				}
+				mf = new MessageFrame("Error", "ERROR 9", "Invalid start time");
+				isValid3=false;
+				mf.setVisible(true);
+			}else if (sec>=60){
+				if (mf != null) {
+					mf.dispose();
+				}
+				mf = new MessageFrame("Error", "ERROR 9", "Invalid start time");
+				isValid3=false;
+				mf.setVisible(true);		
+			}
+		}
+		return isValid3;
+	}
+	
+	/**
+	 * Check if the string contains only numbers.
+	 * @param string
+	 * @return true if the string contain only numeric value
+	 */
+	public static boolean isInteger(String string){return string.matches("-?\\d+(\\.\\d+)?");}
 }

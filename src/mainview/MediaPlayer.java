@@ -14,7 +14,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import add_mp3_file.MergeAudioAndVideo;
 import add_mp3_file.AddMp3FileFrame;
 import add_mp3_file.InvalidFilesCheck;
@@ -28,10 +27,8 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
@@ -764,9 +761,11 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			//Get the index of selected rows
 			int[] selectedRows=table.getSelectedRows();
 			ArrayList<String> mp3Files= new ArrayList<String>();
+			ArrayList<String> startTimes= new ArrayList<String>();
 			for(int i: selectedRows){
 				//Get the name of mp3 files from selected row
 				mp3Files.add((String)table.getValueAt(i, 0));
+				startTimes.add((String)table.getValueAt(i, 1));
 			}
 			//Check if user have selected at least 1 video file
 			if(mp3Files.isEmpty()){
@@ -781,14 +780,19 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			//Check if the inputs are valid
 			InvalidFilesCheck ifc1= new InvalidFilesCheck(videoFiletf.getText(),saveDirectory.getText()
 					+ System.getProperty("file.separator")+ newFileName.getText() + ".avi", saveDirectory.getText());
+			
 			InvalidFilesCheck ifc2= new InvalidFilesCheck(mp3Files); 
-			if(ifc1.ErrorChecking()&& ifc2.mp3FilesCheck()){
-				MergeAudioAndVideo amf = new MergeAudioAndVideo(mp3Filetf.getText(),
+			
+			InvalidFilesCheck ifc3= new InvalidFilesCheck(startTimes, videoDuration.getText());
+			
+			if(!ifc1.ErrorChecking() || !ifc2.mp3FilesCheck() || !ifc3.startTimesCheck()){
+			}else{	
+				MergeAudioAndVideo mav = new MergeAudioAndVideo(mp3Files, startTimes,
 						videoFiletf.getText(), saveDirectory.getText()
 						+ System.getProperty("file.separator")+ newFileName.getText() + ".avi",
 						video, statuslbl, playVideoCheckBox.isSelected(),
 						this);
-				amf.execute();
+				mav.execute();
 			}
 		}else if(e.getSource()== playMp3Files){
 			//Get the index of selected rows
