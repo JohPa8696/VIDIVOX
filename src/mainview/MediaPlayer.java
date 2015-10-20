@@ -11,6 +11,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JSlider;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
@@ -162,6 +163,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private final JTextField newFileName = new JTextField();
 	private final JTextField saveDirectory = new JTextField();
 	
+	//J Progress bar
+	private JProgressBar progressBar = new JProgressBar();
 	//File Chooser and Directory chooser
 	private JFileChooser chooser = null;
 	
@@ -333,8 +336,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		save.setEnabled(false);
 
 		// status of file being created
-		statuslbl.setBounds(240, 100, 400, 35);
-		statuslbl.setFont(new Font("Time New Roman", Font.BOLD,15));
+		statuslbl.setBounds(240, 100, 400, 15);
+		statuslbl.setFont(new Font("Time New Roman", Font.PLAIN,13));
 		statuslbl.setForeground(new Color(0, 0, 0));
 		statuslbl.setVisible(true);
 		speech.add(statuslbl);
@@ -368,13 +371,12 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		voiceOptions.setToolTipText("select voice for speech");
 		speech.add(voiceOptions);
 		create.addActionListener(this);
-
-		// set Frame
-		setIconImage(Toolkit.getDefaultToolkit().getImage(
-				MediaPlayer.class.getResource("/javagui/resources/logo.jpg")));
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1330, 830);
-		setContentPane(contentPane);
+		
+		//JProgressBar
+		progressBar.setMaximum(100);
+		progressBar.setBounds(0,120,880,15);
+		progressBar.setForeground(new Color(255,255,255));
+		speech.add(progressBar);
 		
 		// Merge Audio Panel
 		mergeAudio.setBounds(880, 0, 450, 830);
@@ -764,7 +766,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			ssf = new SaveSpeechFrame();
 			ssf.setVisible(true);
 			String[] pitch= spinnerTranslate();
-			ssf.setSyntheticSpeechAttributes(text.getText(),(String)voiceOptions.getSelectedItem(), (double)rateSpnr.getValue(), Integer.parseInt(pitch[0]),Integer.parseInt(pitch[1]));
+			ssf.setSyntheticSpeechAttributes(text.getText(),progressBar,(String)voiceOptions.getSelectedItem(), 
+					(double)rateSpnr.getValue(), Integer.parseInt(pitch[0]),Integer.parseInt(pitch[1]));
 		} else if (e.getSource() == create) {		// Open Create window with tools
 			
 			if(create.getText().equals("Hide")){

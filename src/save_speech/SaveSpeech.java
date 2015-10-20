@@ -1,26 +1,31 @@
 package save_speech;
 
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 
+import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
-public class SaveSpeech extends SwingWorker<Void, Void>{
+public class SaveSpeech extends SwingWorker<Object, Integer>{
 	/**
 	 * Save the users' input text as synthetic speech with voice, rate and pitch as specified
 	 */
 	private String message;
 	private String fileName;
+	private JProgressBar progressBar=null;
 	private String voice;
 	private double rate;
 	private int pitchStart;
 	private int pitchEnd;
-	
+	private int n=0;
 		
-	public SaveSpeech (String message, String fileName, String voice, double rate, int pitchStart, int pitchEnd){
+	public SaveSpeech (String message, String fileName, JProgressBar progressBar, String voice, double rate, int pitchStart, int pitchEnd){
 		this.message = message;
 		this.fileName = fileName;
+		this.progressBar= progressBar;
 		this.voice=voice;
 		this.rate=rate;
 		this.pitchStart=pitchStart;
@@ -51,16 +56,23 @@ public class SaveSpeech extends SwingWorker<Void, Void>{
 		String cmdWavFile= "text2wave -o .tmp.wav .tmp.txt -eval .tmp1.scm";
 		ProcessBuilder buildWav= new ProcessBuilder("/bin/bash","-c",cmdWavFile);
 		Process processWav= buildWav.start();
-		String line;
 		processWav.waitFor();
 		processWav.destroy();
 		
 		//Convert the wave file into mp3 file
-		String cmdText2Wave = "ffmpeg -i .tmp.wav -f mp3 " + fileName;
-		ProcessBuilder builderText2Wave = new ProcessBuilder("/bin/bash", "-c", cmdText2Wave);
-		Process processText2Wave = builderText2Wave.start();
-		processText2Wave.waitFor();
-		processText2Wave.destroy();
+		String cmdMp3File = "ffmpeg -i .tmp.wav -f mp3 " + fileName;
+		ProcessBuilder buildMp3 = new ProcessBuilder("/bin/bash", "-c", cmdMp3File);
+		Process processMp3 = buildMp3.start();
+		InputStream out= processMp3.getInputStream();
+		BufferedReader stdout= new BufferedReader(new InputStreamReader(out));
+		String line;
+		while((line=stdout.readLine()) !=null){
+			n+=5;
+			publish();
+		}
+		
+		processMp3.waitFor();
+		processMp3.destroy();
 
 		// command used in bash terminal
 		// deletes the temporary file
@@ -76,5 +88,14 @@ public class SaveSpeech extends SwingWorker<Void, Void>{
 		
 		return null;
 	}
-
+	
+	@Override
+	protected void process(List<Integer> chunks){
+		progressBar.setValue(n);
+	}
+	@Override
+	protected void done(){
+		progressBar.setValue(100);
+		
+	}
 }

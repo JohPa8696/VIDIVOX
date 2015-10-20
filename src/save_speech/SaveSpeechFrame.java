@@ -9,6 +9,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
@@ -39,6 +40,8 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 	private JLabel nameLabel=new JLabel("File Name");
 	private JLabel mp3 = new JLabel(".mp3");
 	private JLabel directory = new JLabel("Save to");
+	
+	private JProgressBar progressBar=null;
 	
 	private String message;
 	private String voice;
@@ -206,13 +209,14 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 		}
 					
 		// Creates the wave file the user requests
-		SaveSpeech ss = new SaveSpeech(message, fileName, voice, rate, pitchStart, pitchEnd);
+		SaveSpeech ss = new SaveSpeech(message, fileName,progressBar, voice, rate, pitchStart, pitchEnd);
 		ss.execute();
 		thisFrame.dispose();
 	}
 	
-	public void setSyntheticSpeechAttributes(String message, String voice, double rate, int pitchStart, int pitchEnd){
+	public void setSyntheticSpeechAttributes(String message,JProgressBar progressBar, String voice, double rate, int pitchStart, int pitchEnd){
 		this.message = message;
+		this.progressBar=progressBar;
 		this.voice=voice;
 		this.rate=rate;
 		this.pitchStart=pitchStart;
