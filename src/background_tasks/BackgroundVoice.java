@@ -50,14 +50,14 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 	 */
 	@Override
 	protected Object doInBackground() throws Exception {
-		// create a scm file for festival.
+		// Check if the scheme file exists if not create one;
 		String cmd = "if [ ! -f \\\".tmp.scm\\\" ] ; then $(touch .tmp.scm) ; fi";
-		// builds the command and runs it
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmd);
 		Process process = builder.start();
 		process.waitFor();
 		process.destroy();
-		//Creating the commands to execute in the by festival 
+		
+		//Fill the scheme file with festival commands 
 		String cmd1 = "echo -e \"(set! duffint_params '((start "+pitchStart+") (end "+pitchEnd+")))\n"
 				+ "(Parameter.set 'Int_Method 'DuffInt)\n(Parameter.set 'Int_Target_Method Int_Targets_Default)\n"
 				+ "(Parameter.set 'Duration_Stretch "+rate+")\n"
@@ -77,18 +77,17 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 		Field f = process2.getClass().getDeclaredField("pid");
 		f.setAccessible(true);
 		// pid is private in UNIXProcess
-		this.pid= f.getInt(process2);
-	
+		this.pid= f.getInt(process2);	
 		process2.waitFor();
 		process2.destroy();
+		
+		//Destroy teh temporary scheme file
 		String cmd3= "rm -f .tmp.scm";
-		ProcessBuilder builder3= new ProcessBuilder("/bin/bash","-c", cmd3);
-		Process process3= builder3.start();
-		process3.waitFor();
-		process3.destroy();
-		// is needed so the function doesn't end early
-		//while (stdoutBuffered.readLine() != null) {
-		//}
+		ProcessBuilder builder4= new ProcessBuilder("/bin/bash","-c", cmd3);
+		Process process4= builder4.start();
+		process4.waitFor();
+		process4.destroy();
+
 		return null;
 	}
 

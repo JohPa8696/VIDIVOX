@@ -24,17 +24,28 @@ import java.io.File;
 import java.io.IOException;
 
 public class SaveSpeechFrame extends JFrame implements ActionListener, WindowListener{
+	/**
+	 * SaveSpeechFrame let user enter a name for the mp3 file and also select the directory to save the mp3 file to.
+	 */
 	private static String fileName="";
 	private static String folder="";
 	private JPanel contentPane= new JPanel();;
-	private JLabel nameLabel=new JLabel("File Name");
+	
 	private JTextField nameOfFile= new JTextField();
 	private JButton save = new JButton("Save");
 	private JButton cancel = new JButton("Cancel");
 	private JButton browse = new JButton("Browse");
+	
+	private JLabel nameLabel=new JLabel("File Name");
 	private JLabel mp3 = new JLabel(".mp3");
 	private JLabel directory = new JLabel("Save to");
+	
 	private String message;
+	private String voice;
+	private double rate;
+	private int pitchStart;
+	private int pitchEnd;
+	
 	
 	private JFrame thisFrame = this;
 	private JTextField saveTo= new JTextField();
@@ -195,13 +206,17 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 		}
 					
 		// Creates the wave file the user requests
-		SaveSpeech ss = new SaveSpeech(message, fileName);
+		SaveSpeech ss = new SaveSpeech(message, fileName, voice, rate, pitchStart, pitchEnd);
 		ss.execute();
 		thisFrame.dispose();
 	}
-	//set the message
-	public void setSpeech(String message){
+	
+	public void setSyntheticSpeechAttributes(String message, String voice, double rate, int pitchStart, int pitchEnd){
 		this.message = message;
+		this.voice=voice;
+		this.rate=rate;
+		this.pitchStart=pitchStart;
+		this.pitchEnd=pitchEnd;
 	}
 	
 	@Override

@@ -67,8 +67,7 @@ import javax.swing.JScrollBar;
 
 public class MediaPlayer extends JFrame implements ActionListener,ChangeListener {
 	/**
-	 * MediaPlayer is tool to manipulate videos and synthetic speeches. MedidPlayer contains the main method
-	 * which launches the application. 
+	 * MediaPlayer is tool to manipulate videos and synthetic speeches.
 	 */
 	// Icons were taken from Icongal.com
 	private final ImageIcon playIcon = new ImageIcon(
@@ -202,27 +201,6 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private String videoTitle = null;
 	
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(),
-					"/Applications/vlc-2.0.0/VLC.app/Contents/MacOS/lib");
-			Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
-
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				new MediaPlayer();
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
@@ -516,7 +494,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 		// Video effect panel title
 		videoEffectsLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		videoEffectsLabel.setBounds(77, 0, 70, 16);
+		videoEffectsLabel.setBounds(77, 5, 70, 16);
 		videoEffects.add(videoEffectsLabel);
 		
 		//Frame per second label 
@@ -757,11 +735,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			
 			if(!text.getText().trim().equals("")){
 				bg=null;
-				String start= (String) startPitchSpnr.getValue();
-				String startHz= start.substring(0, 3).trim();
-				String end= (String) endPitchSpnr.getValue();
-				String endHz= end.substring(0, 3).trim();
-				bg = new BackgroundVoice(text.getText(),this,(String)voiceOptions.getSelectedItem(), (double)rateSpnr.getValue(), Integer.parseInt(startHz),Integer.parseInt(endHz));
+				String[] pitch= spinnerTranslate();
+				bg = new BackgroundVoice(text.getText(),this,(String)voiceOptions.getSelectedItem(), (double)rateSpnr.getValue(), Integer.parseInt(pitch[0]),Integer.parseInt(pitch[1]));
 				bg.execute();
 				speak.setIcon(null);
 				speak.setText("Cancel");
@@ -771,8 +746,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 7", "Word count is: "
-						+ wordCount() + ". Must be less than 30 words.");
+				mf = new MessageFrame("Error", "ERROR 7", "Number of words: "
+						+ wordCount() + ". Maximum is 30.");
 				mf.setVisible(true);
 				return;
 			} else if (text.getText().equals("")) {
@@ -788,7 +763,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			}
 			ssf = new SaveSpeechFrame();
 			ssf.setVisible(true);
-			ssf.setSpeech(text.getText());
+			String[] pitch= spinnerTranslate();
+			ssf.setSyntheticSpeechAttributes(text.getText(),(String)voiceOptions.getSelectedItem(), (double)rateSpnr.getValue(), Integer.parseInt(pitch[0]),Integer.parseInt(pitch[1]));
 		} else if (e.getSource() == create) {		// Open Create window with tools
 			
 			if(create.getText().equals("Hide")){
@@ -800,16 +776,6 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				this.setBounds(100, 100, 1330, 830);
 				create.setText("Hide");
 			}
-			/*if (amff != null) {
-				amff.dispose();
-			}
-			amff = new AddMp3FileFrame();
-			amff.addVideo(video);
-			amff.addStatuslbl(statuslbl);
-			amff.setVisible(true);
-			amff.addMediaPlayer(this);
-			amff.addCurrentVideo(videoTitle);
-			*/
 		} else if(e.getSource() == videoBrowse){
 			fileChooserInit("Video",videoBrowse);
 		}else if(e.getSource() == mp3Browse){
@@ -893,6 +859,16 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	//set the video file textfield with the name of the current playing file
 	public void addCurrentVideo(String videoFile) {
 		videoFiletf.setText(videoFile);
+	}
+	
+	//Jspinner translation
+	private String[] spinnerTranslate(){
+		String[] pitch= new String[2];
+		String start= (String) startPitchSpnr.getValue();
+		pitch[0]= start.substring(0, 3).trim();
+		String end= (String) endPitchSpnr.getValue();
+		pitch[1]= end.substring(0, 3).trim();
+		return pitch;
 	}
 	
 	/**
