@@ -57,9 +57,9 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 	}
 	
 	@Override
-	protected Object doInBackground() throws IOException {
+	protected Object doInBackground() throws Exception {
 		timeConvertor(); // Convert all start time to second
-		String f= new java.io.File(".").getCanonicalPath();
+		String f= System.getProperty("user.home")+"/Throwable_dpha010";
 		
 		String cmdOutputFile="ffmpeg -y -i "+vidFile;
 		
@@ -68,7 +68,6 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 			commands.add("ffmpeg -y -i "+mp3Files.get(i)+
 					" -filter_complex \"aevalsrc=0:d="+startTimesInSecond.get(i)+"[s1];[s1][0:a]concat=n=2:v=0:a=1[aout]\" -map [aout] "+ f+"/foo"+i+".mp3");
 			cmdOutputFile=cmdOutputFile+" -i "+f+"/foo"+i+".mp3";
-			System.out.println("IM IN HERE");
 		}
 		cmdOutputFile=cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" "+outputFile;
 		//Execute the mp3 files commands
@@ -77,31 +76,16 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 			System.out.println(s);
 			ProcessBuilder buildMp3Files= new ProcessBuilder("/bin/bash","-c",s);
 			Process processMp3Files=buildMp3Files.start();
+			//Read input from error stream, see when the file is done.
 			InputStream out= processMp3Files.getErrorStream();
 			BufferedReader bf=new BufferedReader(new InputStreamReader(out));
-			String line;
-			while((line=bf.readLine())!=null){
-				System.out.println(line);
+			while((bf.readLine())!=null){
 				publish();
 			}
-			//processMp3Files.waitFor();
+			processMp3Files.waitFor();
 			processMp3Files.destroy();
 		}
-		/*
-		//Build the command to create the output file
-		String cmd="ffmpeg -y -i "+vidFile+" -i "+mp3Files.get(0)+" -filter_complex amix=inputs=2 "+outputFile;
-		ProcessBuilder builder= new ProcessBuilder("/bin/bash", "-c",cmd);
-		Process process=builder.start();
-		//Read output from the terminal which is the copying process
-		InputStream stdout = process.getErrorStream();
-		BufferedReader stdoutBuffered = new BufferedReader( new InputStreamReader(stdout));
-		//while loop exit only when there is no more input from the terminal meaning the file is created completely
-		while (stdoutBuffered.readLine() != null) {
-			publish ();
-		}
-		process.waitFor();
-		process.destroy();
-		*/
+		
 		return null;
 	}
 	@Override 

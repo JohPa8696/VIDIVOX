@@ -98,15 +98,10 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 		saveTo.setText(folder);
 		contentPane.add(saveTo);
 		saveTo.setColumns(10);
-		// defaults the save path to current directory
-		try {
-			if(folder.equals("")){
-				saveTo.setText(new java.io.File(".").getCanonicalPath());
-			}else{
-				saveTo.setText(folder);
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		if(folder.equals("")){
+			saveTo.setText(System.getProperty("user.home")+"/Throwable_dpha010");
+		}else{
+			saveTo.setText(folder);
 		}
 		//Browse button let user browse for a directory to save the file
 		browse.addActionListener(this);

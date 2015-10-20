@@ -75,6 +75,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			MediaPlayer.class.getResource("/javagui/resources/Mute1.png"));
 	private final ImageIcon tickIcon = new ImageIcon(
 			MediaPlayer.class.getResource("/javagui/resources/tick48.png"));
+	private final ImageIcon addIcon = new ImageIcon(
+			MediaPlayer.class.getResource("/javagui/resources/Add.png"));
 	//Panels
 	private final JPanel contentPane = new JPanel();;
 	private final JPanel screen = new JPanel();
@@ -101,6 +103,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private final JButton confirm = new JButton("Start Merging");
 	private final JButton playMp3Files= new JButton("Play");
 	private final JButton deleteMp3Files= new JButton("Delete");
+	private final JButton addToTable = new JButton("");
+	
 	//Sliders
 	private final JSlider volumeSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
 	
@@ -301,7 +305,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 		//Voice label
 		voicelbl.setFont(new Font("Time New Roman", Font.PLAIN, 16));
-		voicelbl.setBounds(220, 15, 50, 25);
+		voicelbl.setBounds(190, 15, 50, 25);
 		speech.add(voicelbl);
 		
 		//Rate label
@@ -370,7 +374,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 		// COmbo box for choosing voice
 		voiceOptions.setModel(new DefaultComboBoxModel(new String[] {"kal_diphone", "Auckland"}));
-		voiceOptions.setBounds(275, 15, 100, 25);
+		voiceOptions.setBounds(245, 15, 130, 25);
 		voiceOptions.setToolTipText("select voice for speech");
 		speech.add(voiceOptions);
 		create.addActionListener(this);
@@ -429,6 +433,13 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		filesPanel.add(mp3Browse);
 		mp3Browse.addActionListener(this);
 		
+		//add the mp3 file to the table button
+		addToTable.setBounds(346, 150, 75, 25);
+		addToTable.setIcon(addIcon);
+		addToTable.setToolTipText("Add the mp3 file to the table below");
+		filesPanel.add(addToTable);
+		addToTable.addActionListener(this);
+		addToTable.setEnabled(false);
 		//Video duration label
 		videoDuration.setHorizontalAlignment(SwingConstants.CENTER);
 		videoDuration.setBounds(164, 82, 103, 25);
@@ -566,11 +577,11 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		saveDirectory.setColumns(10);
 		saveDirectory.setBounds(94, 212, 224, 22);
 		confirmPanel.add(saveDirectory);
-		try {
-			saveDirectory.setText(new java.io.File(".").getCanonicalPath());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		//try {
+			saveDirectory.setText(System.getProperty("user.home")+"/Throwable_dpha010");
+		//} catch (IOException e1) {
+			//e1.printStackTrace();
+		//}
 		
 		//Browse for directory button
 		dirBrowse.setBounds(330, 211, 75, 25);
@@ -632,6 +643,9 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		// Only show minute and second
 		timeCalculator();
 		
+		if(!mp3Filetf.getText().equals("")){
+			addToTable.setEnabled(true);
+		}
 		//Set video length
 		if( videoFiletf.getText().equals(videoTitle)){
 			videoLength.setText(videoDuration.getText());
@@ -757,6 +771,11 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			audioFileChooser();
 		}else if(e.getSource() == dirBrowse){
 			directoryChooser();
+		}else if(e.getSource()== addToTable){
+			Object[] row = new Object[2];
+			row[0]=mp3Filetf.getText();
+			row[1]="00:00";
+			model.addRow(row);
 		}else if(e.getSource() == confirm){
 			//Get the index of selected rows
 			int[] selectedRows=table.getSelectedRows();
@@ -935,10 +954,6 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				GetMediaFileDurationTask durationTask= new GetMediaFileDurationTask(audioFile,mp3Duration);
 				durationTask.execute();
 				mp3Filetf.setText(chooser.getSelectedFile().toString());
-				Object[] row = new Object[2];
-				row[0]=chooser.getSelectedFile().toString();
-				row[1]="00:00";
-				model.addRow(row);
 				durationTask=null;
 			}
 			chooser=null;
