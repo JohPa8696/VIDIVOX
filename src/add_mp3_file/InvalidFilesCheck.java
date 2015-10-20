@@ -50,8 +50,8 @@ public class InvalidFilesCheck {
 	public InvalidFilesCheck(ArrayList<String> startTimes, String videoDuration){
 		this.startTimes=startTimes;
 		this.videoDuration=videoDuration;
-		int minute=Integer.parseInt(videoDuration.substring(0,1));
-		int second=Integer.parseInt(videoDuration.substring(3,4));
+		this.minute=Integer.parseInt(this.videoDuration.substring(0,2));
+		this.second=Integer.parseInt(this.videoDuration.substring(3,5));
 	}
 	/**
 	 * Check user inputs for name of new file, video file and the directory are valid.
@@ -151,9 +151,8 @@ public class InvalidFilesCheck {
 					return isValid3;
 				}
 			}
-			int min=Integer.parseInt(s.substring(0,1));
-			int sec=Integer.parseInt(s.substring(3,4));
-			System.out.println(sec + "----" +min);
+			int min=Integer.parseInt(s.substring(0,2));
+			int sec=Integer.parseInt(s.substring(3,5));
 			if((min*60 +sec)>(minute*60+second)){
 				if (mf != null) {
 					mf.dispose();

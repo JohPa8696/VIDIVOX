@@ -2,6 +2,7 @@ package add_mp3_file;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -17,10 +18,12 @@ import mainview.MediaPlayer;
 
 public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 	/**
-	 * AddMp3
+	 * MergeAudioAndVideo merges audio files with video files at specific time points
 	 */
 	private ArrayList<String> mp3Files= null;
 	private ArrayList<String> startTimes= null;
+	private ArrayList<Integer> startTimesInSecond= new ArrayList<Integer>();
+	private ArrayList<String> commands= new ArrayList<String>();
 	private String vidFile;
 	private String outputFile;
 	private EmbeddedMediaPlayer video;
@@ -30,7 +33,17 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 	private MediaPlayer mediaPlayer;
 	private int n=0;
 	
-	
+	/**
+	 * Constructor
+	 * @param mp3Files
+	 * @param startTimes
+	 * @param vidFile
+	 * @param outputFile
+	 * @param video
+	 * @param statuslbl
+	 * @param playVideo
+	 * @param mediaPlayer
+	 */
 	public MergeAudioAndVideo(ArrayList<String> mp3Files,ArrayList<String> startTimes, String vidFile ,String outputFile ,EmbeddedMediaPlayer video, JLabel statuslbl, boolean playVideo, MediaPlayer mediaPlayer){
 		this.mp3Files = mp3Files;
 		this.startTimes=startTimes;
@@ -44,34 +57,61 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 	}
 	
 	@Override
-	protected Object doInBackground() throws Exception {
+	protected Object doInBackground() throws IOException {
+		timeConvertor(); // Convert all start time to second
+		String f= new java.io.File(".").getCanonicalPath();
 		
-		if(mp3Files.size()==1){
-			String cmd="ffmpeg -y -i "+vidFile+" -i "+mp3Files.get(0)+" -filter_complex amix=inputs=2 "+outputFile;
-			ProcessBuilder builder= new ProcessBuilder("/bin/bash", "-c",cmd);
-			Process process=builder.start();
-			//Read output from the terminal which is the copying process
-			InputStream stdout = process.getErrorStream();
-			BufferedReader stdoutBuffered = new BufferedReader( new InputStreamReader(stdout));
-			//while loop exit only when there is no more input from the terminal meaning the file is created completely
-			String line;
-			while ((line=stdoutBuffered.readLine()) != null) {
-				publish ();
-			}
-			process.waitFor();
-			process.destroy();
-		}else{
-			
+		String cmdOutputFile="ffmpeg -y -i "+vidFile;
+		
+		//Build the commands to create mp3 files with start time length. Commands using aevalsrc filter
+		for(int i=0; i< mp3Files.size(); i++){
+			commands.add("ffmpeg -y -i "+mp3Files.get(i)+
+					" -filter_complex \"aevalsrc=0:d="+startTimesInSecond.get(i)+"[s1];[s1][0:a]concat=n=2:v=0:a=1[aout]\" -map [aout] "+ f+"/foo"+i+".mp3");
+			cmdOutputFile=cmdOutputFile+" -i "+f+"/foo"+i+".mp3";
+			System.out.println("IM IN HERE");
 		}
+		cmdOutputFile=cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" "+outputFile;
+		//Execute the mp3 files commands
+		commands.add(cmdOutputFile);
+		for(String s: commands){
+			System.out.println(s);
+			ProcessBuilder buildMp3Files= new ProcessBuilder("/bin/bash","-c",s);
+			Process processMp3Files=buildMp3Files.start();
+			InputStream out= processMp3Files.getErrorStream();
+			BufferedReader bf=new BufferedReader(new InputStreamReader(out));
+			String line;
+			while((line=bf.readLine())!=null){
+				System.out.println(line);
+				publish();
+			}
+			//processMp3Files.waitFor();
+			processMp3Files.destroy();
+		}
+		/*
+		//Build the command to create the output file
+		String cmd="ffmpeg -y -i "+vidFile+" -i "+mp3Files.get(0)+" -filter_complex amix=inputs=2 "+outputFile;
+		ProcessBuilder builder= new ProcessBuilder("/bin/bash", "-c",cmd);
+		Process process=builder.start();
+		//Read output from the terminal which is the copying process
+		InputStream stdout = process.getErrorStream();
+		BufferedReader stdoutBuffered = new BufferedReader( new InputStreamReader(stdout));
+		//while loop exit only when there is no more input from the terminal meaning the file is created completely
+		while (stdoutBuffered.readLine() != null) {
+			publish ();
+		}
+		process.waitFor();
+		process.destroy();
+		*/
 		return null;
 	}
 	@Override 
 	protected void process(List<Integer> chunks){
 		
 		this.statuslbl.setText("Creating "+outputName.getName()+", please wait...");
-		n+=20;
+		n+=5;
 		mediaPlayer.getProgressBar().setValue(n);
 	}
+	
 	@Override
 	protected void done(){
 		this.statuslbl.setText("Successfully created "+outputName.getName()+"!");
@@ -86,5 +126,15 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 			mediaPlayer.enableButtons();
 		}
 	}
-
+	
+	/**
+	 * Convert from minute:second time format to second
+	 */
+	public void timeConvertor(){
+		for(String s: startTimes){
+			int min=Integer.parseInt(s.substring(0,2));
+			int sec=Integer.parseInt(s.substring(3,5));
+			startTimesInSecond.add(min*60 +sec);
+		}
+	}
 }
