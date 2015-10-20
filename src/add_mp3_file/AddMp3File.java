@@ -11,10 +11,11 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 
+import background_tasks.GetMediaFileDurationTask;
 import mainview.MediaPlayer;
 
 public class AddMp3File extends SwingWorker<Object,Integer> {
-	private String fileName;
+	private String audFile;
 	private String vidFile;
 	private String outputFile;
 	private EmbeddedMediaPlayer video;
@@ -22,14 +23,15 @@ public class AddMp3File extends SwingWorker<Object,Integer> {
 	private boolean playVideo;
 	private File outputName;
 	private MediaPlayer mediaPlayer;
+	private int n=0;
 	
 	/**
 	 * constructor
 	 * @param fileName
 	 * @param video
 	 */
-	public AddMp3File(String fileName, String vidFile ,String outputFile ,EmbeddedMediaPlayer video, JLabel statuslbl, boolean playVideo, MediaPlayer mediaPlayer){
-		this.fileName = fileName;
+	public AddMp3File(String audFile, String vidFile ,String outputFile ,EmbeddedMediaPlayer video, JLabel statuslbl, boolean playVideo, MediaPlayer mediaPlayer){
+		this.audFile = audFile;
 		this.vidFile = vidFile;
 		this.outputFile = outputFile;
 		outputName = new File(outputFile);
@@ -41,15 +43,16 @@ public class AddMp3File extends SwingWorker<Object,Integer> {
 	
 	@Override
 	protected Object doInBackground() throws Exception {
-		String cmd="ffmpeg -y -i "+vidFile+" -i "+fileName+" -filter_complex amix=inputs=2 "+outputFile;
+		String cmd="ffmpeg -y -i "+vidFile+" -i "+audFile+" -filter_complex amix=inputs=2 "+outputFile;
 		ProcessBuilder builder= new ProcessBuilder("/bin/bash", "-c",cmd);
 		Process process=builder.start();
-		publish();
 		//Read output from the terminal which is the copying process
-		InputStream stdout = process.getInputStream();
+		InputStream stdout = process.getErrorStream();
 		BufferedReader stdoutBuffered = new BufferedReader( new InputStreamReader(stdout));
 		//while loop exit only when there is no more input from the terminal meaning the file is created completely
-		while (stdoutBuffered.readLine() != null) {
+		String line;
+		while ((line=stdoutBuffered.readLine()) != null) {
+			publish ();
 		}
 		process.waitFor();
 		process.destroy();
@@ -57,17 +60,23 @@ public class AddMp3File extends SwingWorker<Object,Integer> {
 	}
 	@Override 
 	protected void process(List<Integer> chunks){
+		
 		this.statuslbl.setText("Creating "+outputName.getName()+", please wait...");
+		n+=20;
+		mediaPlayer.getProgressBar().setValue(n);
 	}
 	@Override
 	protected void done(){
 		this.statuslbl.setText("Successfully created "+outputName.getName()+"!");
-		
+		mediaPlayer.getProgressBar().setValue(500);
+		GetMediaFileDurationTask durationTask= new GetMediaFileDurationTask(outputFile,mediaPlayer.getVideoDurationLabel());
 		if(playVideo){
 			video.playMedia(outputFile);
 			mediaPlayer.setVideoTitle(outputFile);
 			mediaPlayer.setTime();
+			durationTask.execute();
 			video.start();
+			mediaPlayer.enableButtons();
 		}
 	}
 

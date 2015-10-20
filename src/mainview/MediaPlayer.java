@@ -13,7 +13,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import add_mp3_file.AddMp3File;
 import add_mp3_file.AddMp3FileFrame;
+import add_mp3_file.InvalidFilesCheck;
 import background_tasks.BackgroundVoice;
 import background_tasks.GetMediaFileDurationTask;
 import background_tasks.SkipBackground;
@@ -23,6 +26,7 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -67,7 +71,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			MediaPlayer.class.getResource("/javagui/resources/Speak2.png"));
 	private final ImageIcon muteIcon = new ImageIcon(
 			MediaPlayer.class.getResource("/javagui/resources/Mute1.png"));
-	
+	private final ImageIcon tickIcon = new ImageIcon(
+			MediaPlayer.class.getResource("/javagui/resources/tick48.png"));
 	//Panels
 	private final JPanel contentPane = new JPanel();;
 	private final JPanel screen = new JPanel();
@@ -91,8 +96,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private final JButton mp3Browse = new JButton("Browse");
 	private final JButton videoBrowse = new JButton("Browse");
 	private final JButton dirBrowse = new JButton("Browse");
-	private final JButton confirm = new JButton("Confirm");
-	private final JButton cancel = new JButton("Cancel");
+	private final JButton confirm = new JButton("Start Merging");
 	
 	//Sliders
 	private final JSlider volumeSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
@@ -361,14 +365,14 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		speech.add(endPitchSpnr);
 		
 		// COmbo box for choosing voice
-		voiceOptions.setModel(new DefaultComboBoxModel(new String[] {"Normal", "Auckland", "kal_diphone"}));
+		voiceOptions.setModel(new DefaultComboBoxModel(new String[] {"kal_diphone", "Auckland"}));
 		voiceOptions.setBounds(275, 15, 100, 25);
 		voiceOptions.setToolTipText("select voice for speech");
 		speech.add(voiceOptions);
 		create.addActionListener(this);
 		
 		//JProgressBar
-		progressBar.setMaximum(100);
+		progressBar.setMaximum(500);
 		progressBar.setBounds(0,120,880,15);
 		progressBar.setForeground(new Color(255,255,255));
 		speech.add(progressBar);
@@ -579,15 +583,11 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		confirmPanel.add(playVideoCheckBox);
 		
 		//set up confirm button
-		confirm.setBounds(68, 294, 97, 25);
+		confirm.setBounds(120, 290, 200, 45);
+		confirm.setIcon(tickIcon);
 		confirmPanel.add(confirm);
 		confirm.addActionListener(this);
-		
-		//set up cancel button
-		cancel.setBounds(308, 294, 97, 25);
-		confirmPanel.add(cancel);
-		cancel.addActionListener(this);
-		
+	
 		//table of time points
 		table.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		table.setModel(new DefaultTableModel(
@@ -745,7 +745,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			ssf = new SaveSpeechFrame();
 			ssf.setVisible(true);
 			String[] pitch= spinnerTranslate();
-			ssf.setSyntheticSpeechAttributes(text.getText(),progressBar,(String)voiceOptions.getSelectedItem(), 
+			ssf.setSyntheticSpeechAttributes(text.getText(),statuslbl,progressBar,(String)voiceOptions.getSelectedItem(), 
 					(double)rateSpnr.getValue(), Integer.parseInt(pitch[0]),Integer.parseInt(pitch[1]));
 		} else if (e.getSource() == create) {		// Open Create window with tools
 			
@@ -764,6 +764,17 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			fileChooserInit("mp3",mp3Browse);
 		}else if(e.getSource() == dirBrowse){
 			directoryChooser();
+		}else if(e.getSource() == confirm){
+			InvalidFilesCheck ifc= new InvalidFilesCheck(videoFiletf.getText(),mp3Filetf.getText(),saveDirectory.getText()
+					+ System.getProperty("file.separator")+ newFileName.getText() + ".avi", saveDirectory.getText());
+			if(!ifc.ErrorChecking()){
+				AddMp3File amf = new AddMp3File(mp3Filetf.getText(),
+						videoFiletf.getText(), saveDirectory.getText()
+						+ System.getProperty("file.separator")+ newFileName.getText() + ".avi",
+						video, statuslbl, playVideoCheckBox.isSelected(),
+						this);
+				amf.execute();
+			}
 		}
 	}
 
@@ -908,6 +919,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	public JLabel getStatuslbl() {return this.statuslbl;}
 	public JButton getSpeakButton(){return this.speak;}
 	public ImageIcon getSpeakIcon(){return this.speakIcon;}
+	public JLabel getVideoDurationLabel(){ return this.videoLength;}
+	public JProgressBar getProgressBar(){return this.progressBar;}
 	//set the video file textfield with the name of the current playing file
 	public void addCurrentVideo(String videoFile) {videoFiletf.setText(videoFile);}
 }

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
@@ -16,15 +17,17 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 	private String message;
 	private String fileName;
 	private JProgressBar progressBar=null;
+	private JLabel statuslbl=null;
 	private String voice;
 	private double rate;
 	private int pitchStart;
 	private int pitchEnd;
 	private int n=0;
 		
-	public SaveSpeech (String message, String fileName, JProgressBar progressBar, String voice, double rate, int pitchStart, int pitchEnd){
+	public SaveSpeech (String message, String fileName,JLabel statuslbl, JProgressBar progressBar, String voice, double rate, int pitchStart, int pitchEnd){
 		this.message = message;
 		this.fileName = fileName;
+		this.statuslbl=statuslbl;
 		this.progressBar= progressBar;
 		this.voice=voice;
 		this.rate=rate;
@@ -38,7 +41,8 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		// create a temporary scheme file
 		String cmdSchemeFile = "echo -e \"(set! duffint_params '((start "+pitchStart+") (end "+pitchEnd+")))\n"
 				+ "(Parameter.set 'Int_Method 'DuffInt)\n(Parameter.set 'Int_Target_Method Int_Targets_Default)\n"
-				+ "(Parameter.set 'Duration_Stretch "+rate+")\">.tmp1.scm ";
+				+ "(Parameter.set 'Duration_Stretch "+rate+")\n"+
+				"(voice_"+this.voice+")\">.tmp1.scm ";
 		
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmdSchemeFile);
 		Process process = builder.start();
@@ -63,11 +67,11 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		String cmdMp3File = "ffmpeg -i .tmp.wav -f mp3 " + fileName;
 		ProcessBuilder buildMp3 = new ProcessBuilder("/bin/bash", "-c", cmdMp3File);
 		Process processMp3 = buildMp3.start();
-		InputStream out= processMp3.getInputStream();
+		InputStream out= processMp3.getErrorStream();
 		BufferedReader stdout= new BufferedReader(new InputStreamReader(out));
 		String line;
 		while((line=stdout.readLine()) !=null){
-			n+=5;
+			n+=10;
 			publish();
 		}
 		
@@ -91,11 +95,15 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 	
 	@Override
 	protected void process(List<Integer> chunks){
+		String[] s= fileName.split("/");
+		this.statuslbl.setText("Creating "+s[s.length-1]+", please wait...");
 		progressBar.setValue(n);
 	}
 	@Override
 	protected void done(){
-		progressBar.setValue(100);
+		String[] s= fileName.split("/");
+		this.statuslbl.setText("Sucessfully created "+s[s.length-1]+"!");
+		progressBar.setValue(500);
 		
 	}
 }

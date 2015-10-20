@@ -61,6 +61,7 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 		String cmd1 = "echo -e \"(set! duffint_params '((start "+pitchStart+") (end "+pitchEnd+")))\n"
 				+ "(Parameter.set 'Int_Method 'DuffInt)\n(Parameter.set 'Int_Target_Method Int_Targets_Default)\n"
 				+ "(Parameter.set 'Duration_Stretch "+rate+")\n"
+				+ "(voice_"+this.voice+")\n"
 				+ "(SayText \\\""+message+"\\\")\">.tmp.scm ";
 		
 		ProcessBuilder builder1= new ProcessBuilder("/bin/bash","-c", cmd1);
@@ -81,13 +82,7 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 		process2.waitFor();
 		process2.destroy();
 		
-		//Destroy teh temporary scheme file
-		String cmd3= "rm -f .tmp.scm";
-		ProcessBuilder builder4= new ProcessBuilder("/bin/bash","-c", cmd3);
-		Process process4= builder4.start();
-		process4.waitFor();
-		process4.destroy();
-
+	
 		return null;
 	}
 
@@ -130,6 +125,18 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 			}
 		} catch (InterruptedException e1) {
 		} catch (ExecutionException e1) {
+		}
+
+		//Destroy teh temporary scheme file
+		String cmd3= "rm -f .tmp.scm";
+		ProcessBuilder builder4= new ProcessBuilder("/bin/bash","-c", cmd3);
+		Process process4;
+		try {
+			process4 = builder4.start();
+			process4.waitFor();
+			process4.destroy();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
 		}
 		this.mediaPlayer.getSpeakButton().setText("");
 		this.mediaPlayer.getSpeakButton().setIcon(mediaPlayer.getSpeakIcon());
