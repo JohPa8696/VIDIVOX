@@ -157,7 +157,7 @@ public class AddMp3FileFrame extends JFrame {
 					mf.setVisible(true);
 					return;
 				} else {
-					AddMp3File amf = new AddMp3File(mp3FileText.getText(),
+					MergeAudioAndVideo amf = new MergeAudioAndVideo(mp3FileText.getText(),
 							videoFileText.getText(), newFile.getAbsolutePath(),
 							video, statuslbl, playVideoCheck.isSelected(),
 							mediaPlayer);

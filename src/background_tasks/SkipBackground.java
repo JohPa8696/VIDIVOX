@@ -8,6 +8,9 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import javax.swing.SwingWorker;
 
 public class SkipBackground extends SwingWorker<Object,Integer>{
+	/**
+	 * Skipbackground take the skip the video forward or backward by 3 seconds whenever the fast forward or backwards is triggered
+	 */
 	private EmbeddedMediaPlayer video;
 	private boolean skipForward;
 	
@@ -18,7 +21,9 @@ public class SkipBackground extends SwingWorker<Object,Integer>{
 	public SkipBackground() {
 	}
 	/**
-	 * custom constructor
+	 * Defined Constructor
+	 * @param b
+	 * @param video
 	 */
 	public SkipBackground(boolean b,EmbeddedMediaPlayer video) {
 		this.skipForward=b;
@@ -28,7 +33,10 @@ public class SkipBackground extends SwingWorker<Object,Integer>{
 	@Override
 	protected Object doInBackground() throws Exception {
 		while(!this.isCancelled()){
-			publish(i);
+				publish(i);
+				if(video.getTime()<3000 && !skipForward){
+					return null;
+				}
 			try{
 			Thread.sleep(500);
 			}catch(Exception e){

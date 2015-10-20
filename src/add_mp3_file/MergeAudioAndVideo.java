@@ -14,7 +14,10 @@ import javax.swing.SwingWorker;
 import background_tasks.GetMediaFileDurationTask;
 import mainview.MediaPlayer;
 
-public class AddMp3File extends SwingWorker<Object,Integer> {
+public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
+	/**
+	 * AddMp3
+	 */
 	private String audFile;
 	private String vidFile;
 	private String outputFile;
@@ -30,7 +33,7 @@ public class AddMp3File extends SwingWorker<Object,Integer> {
 	 * @param fileName
 	 * @param video
 	 */
-	public AddMp3File(String audFile, String vidFile ,String outputFile ,EmbeddedMediaPlayer video, JLabel statuslbl, boolean playVideo, MediaPlayer mediaPlayer){
+	public MergeAudioAndVideo(String audFile, String vidFile ,String outputFile ,EmbeddedMediaPlayer video, JLabel statuslbl, boolean playVideo, MediaPlayer mediaPlayer){
 		this.audFile = audFile;
 		this.vidFile = vidFile;
 		this.outputFile = outputFile;
