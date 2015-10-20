@@ -1,12 +1,7 @@
 package save_speech;
-
-import generic_frames.BrowseFileFrame;
 import generic_frames.MessageFrame;
-
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -15,8 +10,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JButton;
-
-import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -213,7 +206,15 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 		ss.execute();
 		thisFrame.dispose();
 	}
-	
+	/**
+	 * Set the properties (rate,pitch etc..) for the synthetic speech
+	 * @param message
+	 * @param progressBar
+	 * @param voice
+	 * @param rate
+	 * @param pitchStart
+	 * @param pitchEnd
+	 */
 	public void setSyntheticSpeechAttributes(String message,JProgressBar progressBar, String voice, double rate, int pitchStart, int pitchEnd){
 		this.message = message;
 		this.progressBar=progressBar;
@@ -223,39 +224,22 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 		this.pitchEnd=pitchEnd;
 	}
 	
-	@Override
-	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 	@Override
 	public void windowClosed(WindowEvent arg0) {
 		fileName= nameOfFile.getText();
 		folder=saveTo.getText();
 	}
-	
 	@Override
-	public void windowClosing(WindowEvent arg0) {
-		
-	}
+	public void windowActivated(WindowEvent arg0) {}
 	@Override
-	public void windowDeactivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void windowClosing(WindowEvent arg0) {}
 	@Override
-	public void windowDeiconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void windowDeactivated(WindowEvent arg0) {}
 	@Override
-	public void windowIconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void windowDeiconified(WindowEvent arg0) {}
 	@Override
-	public void windowOpened(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void windowIconified(WindowEvent arg0) {	}
+	@Override
+	public void windowOpened(WindowEvent arg0) {}
 }

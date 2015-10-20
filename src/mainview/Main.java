@@ -1,5 +1,7 @@
 package mainview;
 
+import java.awt.Color;
+
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 

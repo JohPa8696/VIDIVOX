@@ -1,13 +1,9 @@
 package mainview;
 
-import generic_frames.BrowseFileFrame;
 import generic_frames.MessageFrame;
 import generic_frames.OptionsFrame;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,54 +13,38 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import add_mp3_file.AddMp3FileFrame;
 import background_tasks.BackgroundVoice;
 import background_tasks.GetMediaFileDurationTask;
 import background_tasks.SkipBackground;
-
-import com.sun.jna.Native;
-import com.sun.jna.NativeLibrary;
-
 import save_speech.SaveSpeechFrame;
-import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
-import uk.co.caprica.vlcj.runtime.RuntimeUtil;
-
-import javax.swing.UIManager;
-
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-
 import java.awt.Font;
 import java.awt.SystemColor;
-
 import javax.swing.SwingConstants;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerListModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
-import java.awt.GridLayout;
-import javax.swing.JLayeredPane;
-import javax.swing.border.LineBorder;
+
 import javax.swing.JCheckBox;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.TitledBorder;
+
 import javax.swing.border.EtchedBorder;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.JScrollBar;
+
 
 public class MediaPlayer extends JFrame implements ActionListener,ChangeListener {
 	/**
@@ -115,7 +95,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private final JButton cancel = new JButton("Cancel");
 	
 	//Sliders
-	private final JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
+	private final JSlider volumeSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
 	
 	//Spinners
 	private final JSpinner startPitchSpnr = new JSpinner();
@@ -129,12 +109,14 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private JSpinner heightSpnr = new JSpinner();
 	
 	//Labels
+	private final JLabel videoLength= new JLabel();
 	private final JLabel statuslbl = new JLabel();
 	private final JLabel volumelbl = new JLabel();
 	private final JLabel voicelbl = new JLabel("Voice");
 	private final JLabel ratelbl= new JLabel("Rate");
 	private final JLabel pitchlbl= new JLabel("Pitch");
 	private final JLabel time = new JLabel();
+	private final JLabel slash= new JLabel("/");
 	private final JLabel mergeTitle = new JLabel("Merge Audio and Video");
 	private final JLabel videoFilelbl = new JLabel("Video File:");
 	private final JLabel mp3Filelbl = new JLabel("mp3 File:");
@@ -231,15 +213,27 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		controls.setLayout(null);
 		
 		// timer
-		time.setBounds(395, 5, 80, 20);
+		time.setBounds(360, 10, 70, 20);
 		time.setFont(new Font("Time New Roman", Font.PLAIN, 15));
-		time.setText("00:00:00");
+		time.setText("00:00");
+		time.setHorizontalAlignment(SwingConstants.CENTER);
 		time.setForeground(Color.BLACK);
 		controls.add(time);
 		
+		//Slash
+		slash.setBounds(425, 10, 10, 20);
+		controls.add(slash);
+		//video length label
+		videoLength.setBounds(425, 10, 70, 20);
+		videoLength.setFont(new Font("Time New Roman", Font.PLAIN, 15));
+		videoLength.setText("00:00");
+		videoLength.setHorizontalAlignment(SwingConstants.CENTER);
+		videoLength.setForeground(Color.BLACK);
+		controls.add(videoLength);
 
+		
 		// pick a video file to play
-		openVideo.setBounds(40, 40, 65, 40);
+		openVideo.setBounds(40, 40, 65, 45);
 		openVideo.setText("Open");
 		openVideo.setToolTipText("Open a Video File");
 		openVideo.addActionListener(this);
@@ -277,15 +271,15 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 
 		// volume slider
-		slider.setBounds(650, 30, 220, 65);
-		slider.setPaintTicks(true);
-		slider.addChangeListener(this);
-		controls.add(slider);
+		volumeSlider.setBounds(650, 30, 220, 65);
+		volumeSlider.setPaintTicks(true);
+		volumeSlider.addChangeListener(this);
+		controls.add(volumeSlider);
 	
 		
 		//Option button
 		option.setBackground(new Color(250, 250, 250));
-		option.setBounds(117, 40, 70, 40);
+		option.setBounds(117, 40, 70, 45);
 		option.setToolTipText("Resize the Screen and Change the Speed of the Video");
 		controls.add(option);
 		option.addActionListener(this);
@@ -315,6 +309,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		// input field
 		text.setFont(new Font("Time New Roman", Font.PLAIN, 18));
 		text.setBounds(200, 65, 560, 30);
+		text.setText("Enter text here");
 		speech.add(text);
 		text.setColumns(10);
 		
@@ -642,27 +637,11 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	public void actionPerformed(ActionEvent e) {
 
 		// Only show minute and second
-		if (((int) video.getTime() != -1)) {
-			if (second < 60) {
-				second = (int) video.getTime() / 1000 - minute * 60;
-			}
-			if (second >= 60) {
-				second = 0;
-				minute = minute + 1;
-			}
-			if (second < 10 || minute < 10) {
-				if (second < 10 && minute < 10) {
-					time.setText("00:" + "0" + minute + ":0" + second);
-				} else if (second < 10) {
-					time.setText("00:" + minute + ":0" + second);
-				} else {
-					time.setText("00:" + "0" + minute + ":" + second);
-				}
-			}
-		} else {
-			second = 0;
-			minute = 0;
-			time.setText("00:00:00");
+		timeCalculator();
+		
+		//Set video length
+		if( videoFiletf.getText().equals(videoTitle)){
+			videoLength.setText(videoDuration.getText());
 		}
 		// If there is video playing set the play button with the stop icon or
 		// otherwise.
@@ -792,59 +771,51 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	 * Change volume of the video when Jslider is moved.
 	 */
 	@Override
-	public void stateChanged(ChangeEvent arg0) {
-		video.setVolume(slider.getValue());
-		if (slider.getValue()==0){
+	public void stateChanged(ChangeEvent c) {
+		video.setVolume(volumeSlider.getValue());
+		if (volumeSlider.getValue()==0){
 			volumelbl.setIcon(muteIcon);
 		}else{
 			volumelbl.setIcon(volumeIcon);
 		}
 	}
-
-	// set the video title
-	public void setVideoTitle(String title) {
-		this.videoTitle = title;
-	}
-
-	// get the video title
-	public String getVideoTitle() {
-		return this.videoTitle;
-	}
-
-	// Get the message from the text field
-	public String getTextMessage() {
-		return text.getText();
-	}
-
-	// Get the video that is currently playing
-	public EmbeddedMediaPlayer getVideo() {
-		return this.video;
-	}
-
-	// Get Jlabel status
-	public JLabel getStatuslbl() {
-		return this.statuslbl;
-	}
-
+	
 	// play the Video
 	public void playVideo() {
 		video.playMedia(videoTitle);
 		video.start();
 	}
-
+	//Calculate time
+	public void timeCalculator(){
+		if (((int) video.getTime() != -1)) {
+			if (second < 60) {
+				second = (int) video.getTime() / 1000 - minute * 60;
+			}
+			if (second >= 60) {
+				second = 0;
+				minute = minute + 1;
+			}
+			if (second < 10 || minute < 10) {
+				if (second < 10 && minute < 10) {
+					time.setText( "0" + minute + ":0" + second);
+				} else if (second < 10) {
+					time.setText( minute + ":0" + second);
+				} else {
+					time.setText("0" + minute + ":" + second);
+				}
+			}
+		} else {
+			second = 0;
+			minute = 0;
+			time.setText("00:00");
+		}
+	}
 	// set the minute and second label to 0
 	public void setTime() {
 		this.second = 0;
 		this.minute = 0;
 	}
-	// get the speak button
-	public JButton getSpeakButton(){
-		return this.speak;
-	}
-	// get the speak Icon
-	public ImageIcon getSpeakIcon(){
-		return this.speakIcon;
-	}
+	
 	// counts number of words in the text field
 	public int wordCount() {
 		String speechText = text.getText().trim();
@@ -858,10 +829,6 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		play.setEnabled(true);
 		forward.setEnabled(true);
 		backward.setEnabled(true);
-	}
-	//set the video file textfield with the name of the current playing file
-	public void addCurrentVideo(String videoFile) {
-		videoFiletf.setText(videoFile);
 	}
 	
 	//Jspinner translation
@@ -893,22 +860,22 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			chooser.setAcceptAllFileFilterUsed(false);
 			
 			if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-				setVideoTitle(chooser.getSelectedFile().toString());
+				String videoFile=chooser.getSelectedFile().toString();
 				GetMediaFileDurationTask durationTask;
 				if(clickedButton.equals(openVideo)){
+					setVideoTitle(videoFile);
 					playVideo();
 					enableButtons();
 					addCurrentVideo(videoTitle);
-					
-					durationTask= new GetMediaFileDurationTask(videoTitle,videoDuration);
+					durationTask= new GetMediaFileDurationTask(videoFile,videoDuration);
 					durationTask.execute();
 				}else if(clickedButton.equals(videoBrowse)){
-					videoFiletf.setText(chooser.getSelectedFile().toString());
-					 durationTask= new GetMediaFileDurationTask(videoTitle,videoDuration);
+					 videoFiletf.setText(chooser.getSelectedFile().toString());
+					 durationTask= new GetMediaFileDurationTask(videoFile,videoDuration);
 					 durationTask.execute();
 				}else{
 					mp3Filetf.setText(chooser.getSelectedFile().toString());
-					 durationTask= new GetMediaFileDurationTask(videoTitle,mp3Duration);
+					 durationTask= new GetMediaFileDurationTask(videoFile,mp3Duration);
 					 durationTask.execute();
 				}
 				durationTask=null;
@@ -933,4 +900,14 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			chooser = null;
 		}
 	}
+	// set the video title
+	public void setVideoTitle(String title) {this.videoTitle = title;}
+	public String getVideoTitle() {return this.videoTitle;}
+	public String getTextMessage() {return text.getText();}
+	public EmbeddedMediaPlayer getVideo() {return this.video;}
+	public JLabel getStatuslbl() {return this.statuslbl;}
+	public JButton getSpeakButton(){return this.speak;}
+	public ImageIcon getSpeakIcon(){return this.speakIcon;}
+	//set the video file textfield with the name of the current playing file
+	public void addCurrentVideo(String videoFile) {videoFiletf.setText(videoFile);}
 }
