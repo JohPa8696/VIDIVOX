@@ -39,10 +39,10 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 	protected Void doInBackground() throws Exception {
 		// command used in bash terminal
 		// create a temporary scheme file
-		String cmdSchemeFile = "echo -e \"(set! duffint_params '((start "+pitchStart+") (end "+pitchEnd+")))\n"
+		String cmdSchemeFile = "echo -e \"(voice_"+this.voice+")\n"+
+				"(set! duffint_params '((start "+pitchStart+") (end "+pitchEnd+")))\n"
 				+ "(Parameter.set 'Int_Method 'DuffInt)\n(Parameter.set 'Int_Target_Method Int_Targets_Default)\n"
-				+ "(Parameter.set 'Duration_Stretch "+rate+")\n"+
-				"(voice_"+this.voice+")\">.tmp1.scm ";
+				+ "(Parameter.set 'Duration_Stretch "+rate+")\">.tmp1.scm ";
 		
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmdSchemeFile);
 		Process process = builder.start();

@@ -27,7 +27,6 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -104,6 +103,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private final JButton playMp3Files= new JButton("Play");
 	private final JButton deleteMp3Files= new JButton("Delete");
 	private final JButton addToTable = new JButton("");
+	private final JButton enableEffects= new JButton("Disable");
 	
 	//Sliders
 	private final JSlider volumeSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 50);
@@ -112,12 +112,10 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private final JSpinner startPitchSpnr = new JSpinner();
 	private final JSpinner endPitchSpnr = new JSpinner();
 	private JSpinner rateSpnr = new JSpinner( new SpinnerNumberModel(new Double(1.5),new Double(0.1),new Double(5.0),new Double(0.1)));
-	private JSpinner bitrateSpnr = new JSpinner();
-	private JSpinner volumeSpnr = new JSpinner();
-	private JSpinner tempoSpnr = new JSpinner();
-	private JSpinner fpsSpnr = new JSpinner();
-	private JSpinner widthSpnr = new JSpinner();
-	private JSpinner heightSpnr = new JSpinner();
+	private JSpinner volumeSpnr = new JSpinner(new SpinnerNumberModel(new Double(1.0),new Double(0.1),new Double(2.0),new Double(0.1)));
+	private JSpinner tempoSpnr = new JSpinner(new SpinnerNumberModel(new Double(1.0),new Double(0.5),new Double(2.0),new Double(0.5)));
+	private JSpinner fpsSpnr = new JSpinner(new SpinnerNumberModel(new Integer(30),new Integer(5),new Integer(60),new Integer(5)));
+
 	
 	//Labels
 	private final JLabel videoLength= new JLabel();
@@ -137,13 +135,12 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private final JLabel videoEffectsLabel = new JLabel("Video");
 	private JLabel videoDuration = new JLabel("00:00");
 	private JLabel mp3Duration = new JLabel("00:00");
-	private final JLabel lblBitrate = new JLabel("Bitrate");
 	private final JLabel lblVolume = new JLabel("Volume");
 	private final JLabel lblTempo = new JLabel("Tempo");
 	private final JLabel lblEcho = new JLabel("Echo");
 	private final JLabel lblFps = new JLabel("FPS");
-	private final JLabel lblWidth = new JLabel("Width");
-	private final JLabel lblHeight = new JLabel("Height");
+	private final JLabel lblTranspose = new JLabel("Transpose");
+	private final JLabel lblStrip = new JLabel("Strip");
 	private final JLabel lblNegate = new JLabel("Negate");
 	private final JLabel effectsLabel = new JLabel("Effects");
 	private final JLabel lblName = new JLabel("Name :");
@@ -168,6 +165,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	//Checkboxes
 	private JCheckBox echoCheckBox = new JCheckBox("");
 	private JCheckBox negateCheckBox = new JCheckBox("");
+	private JCheckBox stripCheckBox = new JCheckBox("");
+	private JCheckBox transposeCheckBox = new JCheckBox("");
 	private final JCheckBox playVideoCheckBox = new JCheckBox("Play the video when finished");
 	
 	//tables
@@ -183,7 +182,6 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private SaveSpeechFrame ssf = null;
 	private BackgroundVoice bg = null;
 	private SkipBackground sg = null;
-	private AddMp3FileFrame amff = null;
 	private MessageFrame mf = null;
 
 	//video player components
@@ -470,35 +468,29 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		audioEffectsLabel.setBounds(68, 5, 70, 16);
 		audioEffects.add(audioEffectsLabel);
 		
-		//Bitrate
-		lblBitrate.setBounds(12, 40, 70, 16);
-		audioEffects.add(lblBitrate);
-		//set up bitrate spinner
-		bitrateSpnr.setBounds(121, 37, 61, 22);
-		audioEffects.add(bitrateSpnr);
-		
+	
 		//volume of mp3 label
-		lblVolume.setBounds(12, 80, 70, 16);
+		lblVolume.setBounds(12, 40, 70, 16);
 		audioEffects.add(lblVolume);
 		
 		//set up volume spinner
-		volumeSpnr.setBounds(121, 77, 61, 22);
+		volumeSpnr.setBounds(121, 37, 61, 22);
 		audioEffects.add(volumeSpnr);
 		
 		//Tempo of mp3 / speed
-		lblTempo.setBounds(12, 123, 70, 16);
+		lblTempo.setBounds(12, 83, 70, 16);
 		audioEffects.add(lblTempo);
 		
 		//set up tempo spinner
-		tempoSpnr.setBounds(121, 120, 61, 22);
+		tempoSpnr.setBounds(121, 80, 61, 22);
 		audioEffects.add(tempoSpnr);
 		
 		//Echo label
-		lblEcho.setBounds(12, 168, 70, 16);
+		lblEcho.setBounds(12, 128, 70, 16);
 		audioEffects.add(lblEcho);
 		
 		// set up the echo checkbox
-		echoCheckBox.setBounds(139, 164, 25, 25);
+		echoCheckBox.setBounds(139, 124, 25, 25);
 		audioEffects.add(echoCheckBox);
 		
 		// set up the Video effects panel
@@ -517,13 +509,20 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		lblFps.setBounds(12, 41, 70, 16);
 		videoEffects.add(lblFps);
 		
-		//video width label
-		lblWidth.setBounds(12, 79, 70, 16);
-		videoEffects.add(lblWidth);
+		//video transpose label
+		lblTranspose.setBounds(12, 79, 80, 16);
+		videoEffects.add(lblTranspose);
 		
-		//video height label
-		lblHeight.setBounds(12, 120, 70, 16);
-		videoEffects.add(lblHeight);
+		//video transpose check box
+		transposeCheckBox.setBounds(150,78,25,25);
+		videoEffects.add(transposeCheckBox);
+		
+		//video strip label
+		lblStrip.setBounds(12, 120, 70, 16);
+		videoEffects.add(lblStrip);
+		//strip audio check box
+		stripCheckBox.setBounds(150, 121, 25, 25);
+		videoEffects.add(stripCheckBox);
 		
 		//negate video color label
 		lblNegate.setBounds(12, 165, 70, 16);
@@ -533,13 +532,6 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		fpsSpnr.setBounds(128, 38, 61, 22);
 		videoEffects.add(fpsSpnr);
 		
-		//set up video width spinner
-		widthSpnr.setBounds(128, 76, 61, 22);
-		videoEffects.add(widthSpnr);
-		
-		//set up video height spinner
-		heightSpnr.setBounds(128, 117, 61, 22);
-		videoEffects.add(heightSpnr);
 		
 		//Negate the color of the video checkbox
 		negateCheckBox.setBounds(150, 161, 25, 25);
@@ -550,6 +542,12 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		effectsLabel.setFont(new Font("Dialog", Font.BOLD, 18));
 		effectsLabel.setBounds(145, 195, 146, 27);
 		mergeAudio.add(effectsLabel);
+		
+		//Set up enable effects button
+		enableEffects.setBounds(10,200,90,25);
+		enableEffects.setToolTipText("Enable/Disable the effects tools");
+		enableEffects.addActionListener(this);
+		mergeAudio.add(enableEffects);
 		
 		// Merge audio and video confirmation panel with time alignments list
 		confirmPanel.setBackground(new Color(255, 255, 255));
@@ -776,6 +774,14 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			row[0]=mp3Filetf.getText();
 			row[1]="00:00";
 			model.addRow(row);
+		}else if(e.getSource()== enableEffects){
+			if(enableEffects.getText().equals("Enable")){
+				enableEffects();
+				enableEffects.setText("Disable");
+			}else{
+				disableEffects();
+				enableEffects.setText("Enable");
+			}
 		}else if(e.getSource() == confirm){
 			//Get the index of selected rows
 			int[] selectedRows=table.getSelectedRows();
@@ -806,13 +812,21 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			
 			if(!ifc1.ErrorChecking() || !ifc2.mp3FilesCheck() || !ifc3.startTimesCheck()){
 			}else{	
-				MergeAudioAndVideo mav = new MergeAudioAndVideo(mp3Files, startTimes,
-						videoFiletf.getText(), saveDirectory.getText()
-						+ System.getProperty("file.separator")+ newFileName.getText() + ".avi",
-						video, statuslbl, playVideoCheckBox.isSelected(),
-						this);
+				ArrayList<Object> effects=null;
+				if(enableEffects.getText().equals("Disable")){
+					effects= getEffects();
+				}else{
+					effects=null;
+				}
+				MergeAudioAndVideo mav = new MergeAudioAndVideo(effects,mp3Files, startTimes,
+					videoFiletf.getText(), saveDirectory.getText()
+					+ System.getProperty("file.separator")+ newFileName.getText() + ".avi",
+					video, statuslbl, playVideoCheckBox.isSelected(),
+					this);
 				mav.execute();
+					
 			}
+			
 		}else if(e.getSource()== playMp3Files){
 			//Get the index of selected rows
 			int[] selectedRows=table.getSelectedRows();
@@ -895,6 +909,40 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		backward.setEnabled(true);
 	}
 	
+	//Enable effects
+	public void enableEffects(){
+		volumeSpnr.setEnabled(true);
+		tempoSpnr.setEnabled(true);
+		echoCheckBox.setEnabled(true);
+		fpsSpnr.setEnabled(true);
+		transposeCheckBox.setEnabled(true);
+		stripCheckBox.setEnabled(true);
+		negateCheckBox.setEnabled(true);
+	}
+	//Disable Effects
+	public void disableEffects(){
+		volumeSpnr.setEnabled(false);
+		tempoSpnr.setEnabled(false);
+		echoCheckBox.setEnabled(false);
+		fpsSpnr.setEnabled(false);
+		transposeCheckBox.setEnabled(false);
+		stripCheckBox.setEnabled(false);
+		negateCheckBox.setEnabled(false);
+	}
+	//Get effects value
+	public ArrayList<Object> getEffects(){
+		ArrayList<Object> effects= new ArrayList<Object>();
+		effects.add(volumeSpnr.getValue());
+		effects.add(tempoSpnr.getValue());
+		effects.add(echoCheckBox.isSelected());
+		effects.add(fpsSpnr.getValue());
+		effects.add(transposeCheckBox.isSelected());
+		effects.add(stripCheckBox.isSelected());
+		effects.add(negateCheckBox.isSelected());
+		return effects;
+		
+	}
+	
 	//Jspinner translation
 	private String[] spinnerTranslate(){
 		String[] pitch= new String[2];
@@ -914,7 +962,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			FileNameExtensionFilter filter;
 			filter = new FileNameExtensionFilter("Video File", "avi", "mp4", "mkv");
 			chooser.setDialogTitle("Choose a Video File");
-			chooser.setCurrentDirectory(new java.io.File("."));
+			chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home")));
 			chooser.setFileFilter((javax.swing.filechooser.FileFilter) filter);
 			chooser.setAcceptAllFileFilterUsed(false);
 			
@@ -946,7 +994,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			chooser = new JFileChooser();
 			FileNameExtensionFilter filter= new FileNameExtensionFilter("Audio File", "mp3");
 			chooser.setDialogTitle("Choose an Audito File");
-			chooser.setCurrentDirectory(new java.io.File("."));
+			chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home")+"/Throwable_dpha010"));
 			chooser.setFileFilter((javax.swing.filechooser.FileFilter) filter);
 			chooser.setAcceptAllFileFilterUsed(false);
 			if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -966,7 +1014,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	public void directoryChooser() {
 		if (chooser == null) {
 			chooser = new JFileChooser();
-			chooser.setCurrentDirectory(new java.io.File("."));
+			chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home")+"/Throwable_dpha010"));
 			chooser.setDialogTitle("Find Directory");
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			chooser.setAcceptAllFileFilterUsed(false);

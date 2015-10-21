@@ -17,8 +17,6 @@ public class Main {
 	 * Main Class launches the Media Player Window
 	 */
 	public static void main(String[] args){
-		GlobalProjectFolder gpf=new GlobalProjectFolder();
-		gpf.execute();
 		try {
 			NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(),
 					"/Applications/vlc-2.0.0/VLC.app/Contents/MacOS/lib");
@@ -28,7 +26,9 @@ public class Main {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-
+		//Create the project folder
+		GlobalProjectFolder gpf=new GlobalProjectFolder();
+		gpf.execute();
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {

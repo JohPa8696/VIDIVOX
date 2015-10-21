@@ -58,10 +58,10 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 		process.destroy();
 		
 		//Fill the scheme file with festival commands 
-		String cmd1 = "echo -e \"(set! duffint_params '((start "+pitchStart+") (end "+pitchEnd+")))\n"
+		String cmd1 = "echo -e \"(voice_"+this.voice+")\n"
+				+ "(set! duffint_params '((start "+pitchStart+") (end "+pitchEnd+")))\n"
 				+ "(Parameter.set 'Int_Method 'DuffInt)\n(Parameter.set 'Int_Target_Method Int_Targets_Default)\n"
 				+ "(Parameter.set 'Duration_Stretch "+rate+")\n"
-				+ "(voice_"+this.voice+")\n"
 				+ "(SayText \\\""+message+"\\\")\">.tmp.scm ";
 		
 		ProcessBuilder builder1= new ProcessBuilder("/bin/bash","-c", cmd1);
