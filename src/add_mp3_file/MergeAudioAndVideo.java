@@ -13,6 +13,7 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 
+import background_tasks.FilesRemover;
 import background_tasks.GetMediaFileDurationTask;
 import mainview.MediaPlayer;
 
@@ -25,6 +26,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 	private ArrayList<Integer> startTimesInSecond= new ArrayList<Integer>();
 	private ArrayList<String> commands= new ArrayList<String>();
 	private ArrayList<Object> effects= null;
+	private ArrayList<String> intermidiateFiles= new ArrayList<String>();
 	private String vidFile;
 	private String outputFile;
 	private EmbeddedMediaPlayer video;
@@ -71,6 +73,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 				String cmdStripAudio= "ffmpeg -y -i "+vidFile+" -c copy -an "+f+"/tmp.avi";
 				ProcessBuilder buildStrip= new ProcessBuilder("/bin/bash","-c",cmdStripAudio);
 				Process processStrip=buildStrip.start();
+				intermidiateFiles.add(f+"/tmp.avi");
 				processStrip.waitFor();
 				processStrip.destroy();
 				vidFile=f+"/tmp.avi";
@@ -83,6 +86,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 			commands.add("ffmpeg -y -i "+mp3Files.get(i)+
 					" -filter_complex \"aevalsrc=0:d="+startTimesInSecond.get(i)+"[s1];[s1][0:a]concat=n=2:v=0:a=1[aout]\" -map [aout] "+ f+"/foo"+i+".mp3");
 			cmdOutputFile=cmdOutputFile+" -i "+f+"/foo"+i+".mp3";
+			intermidiateFiles.add(f+"/foo"+i+".mp3");
 		}
 		
 		//Video effects
@@ -108,6 +112,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 					cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -vf negate,transpose=1 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
 				}
 			}
+			intermidiateFiles.add(f+"/tmp1.avi");
 		}else{
 			cmdOutputFile=cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" "+outputFile;
 		}
@@ -147,7 +152,8 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 			processNewFile.destroy();
 		}
 		//Remove intermidiate files
-		
+		FilesRemover filesRemove= new FilesRemover(intermidiateFiles);
+		filesRemove.execute();
 		return null;
 	}
 	@Override 

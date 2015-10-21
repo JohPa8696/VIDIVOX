@@ -371,7 +371,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		speech.add(endPitchSpnr);
 		
 		// COmbo box for choosing voice
-		voiceOptions.setModel(new DefaultComboBoxModel(new String[] {"kal_diphone", "Auckland"}));
+		voiceOptions.setModel(new DefaultComboBoxModel(new String[] {"Kal", "Auckland","Rab"}));
 		voiceOptions.setBounds(245, 15, 130, 25);
 		voiceOptions.setToolTipText("select voice for speech");
 		speech.add(voiceOptions);
@@ -592,7 +592,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		confirmPanel.add(extensions);
 		
 		//play the video when finished?
-		playVideoCheckBox.setBounds(94, 243, 224, 25);
+		playVideoCheckBox.setBounds(94, 243, 240, 25);
 		confirmPanel.add(playVideoCheckBox);
 		
 		//set up confirm button
@@ -625,6 +625,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MediaPlayer.class.getResource("/javagui/resources/logo.jpg")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1330, 830);
+		setResizable(false);
 		setContentPane(contentPane);
 		setVisible(true);
 
@@ -722,7 +723,16 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			if(!text.getText().trim().equals("")){
 				bg=null;
 				String[] pitch= spinnerTranslate();
-				bg = new BackgroundVoice(text.getText(),this,(String)voiceOptions.getSelectedItem(), (double)rateSpnr.getValue(), Integer.parseInt(pitch[0]),Integer.parseInt(pitch[1]));
+				String voice=(String)voiceOptions.getSelectedItem();
+				if (voice.equals("Kal")){
+					voice="kal_diphone";
+				}else if(voice.equals("Rab")){
+					voice="rab_diphone";
+				}else{
+					voice="akl_nz_jdt_diphone";
+				}
+				bg = new BackgroundVoice(text.getText(),this,voice, 
+						(double)rateSpnr.getValue(), Integer.parseInt(pitch[0]),Integer.parseInt(pitch[1]));
 				bg.execute();
 				speak.setIcon(null);
 				speak.setText("Cancel");
@@ -750,7 +760,15 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			ssf = new SaveSpeechFrame();
 			ssf.setVisible(true);
 			String[] pitch= spinnerTranslate();
-			ssf.setSyntheticSpeechAttributes(text.getText(),statuslbl,progressBar,(String)voiceOptions.getSelectedItem(), 
+			String voice=(String)voiceOptions.getSelectedItem();
+			if (voice.equals("Kal")){
+				voice="kal_diphone";
+			}else if(voice.equals("Rab")){
+				voice="rab_diphone";
+			}else{
+				voice="akl_nz_jdt_diphone";
+			}
+			ssf.setSyntheticSpeechAttributes(text.getText(),statuslbl,progressBar,voice, 
 					(double)rateSpnr.getValue(), Integer.parseInt(pitch[0]),Integer.parseInt(pitch[1]));
 		} else if (e.getSource() == create) {		// Open Create window with tools
 			

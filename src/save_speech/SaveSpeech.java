@@ -60,6 +60,12 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		String cmdWavFile= "text2wave -o .tmp.wav .tmp.txt -eval .tmp1.scm";
 		ProcessBuilder buildWav= new ProcessBuilder("/bin/bash","-c",cmdWavFile);
 		Process processWav= buildWav.start();
+		InputStream out1= processWav.getErrorStream();
+		BufferedReader bf= new BufferedReader(new InputStreamReader(out1));
+		String lin1;
+		while((lin1=bf.readLine())!=null){
+			System.out.println(lin1);
+		}
 		processWav.waitFor();
 		processWav.destroy();
 		
@@ -72,6 +78,7 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		String line;
 		while((line=stdout.readLine()) !=null){
 			n+=10;
+			System.out.println(line);
 			publish();
 		}
 		
@@ -88,7 +95,6 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		Process processDeleteTxt = builderDeleteTmps.start();
 		processDeleteTxt.waitFor();
 		processDeleteTxt.destroy();
-		
 		
 		return null;
 	}
