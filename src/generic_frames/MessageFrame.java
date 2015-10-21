@@ -1,31 +1,35 @@
 package generic_frames;
 
-import java.applet.Applet;
-import java.applet.AudioClip;
-import java.awt.BorderLayout;
+
 import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
+/*
+import java.applet.Applet;
+import java.applet.AudioClip;
+import java.awt.BorderLayout;
 import mainview.MediaPlayer;
 import sun.audio.AudioData;
 import sun.audio.AudioDataStream;
 import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
 import sun.audio.ContinuousAudioDataStream;
-
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+*/
 import javax.swing.JLabel;
 import java.awt.Font;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+
+import mainview.MediaPlayer;
+
 import java.awt.event.ActionListener;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.awt.event.ActionEvent;
 
 public class MessageFrame extends JFrame {
@@ -37,11 +41,13 @@ public class MessageFrame extends JFrame {
 			MediaPlayer.class.getResource("/javagui/resources/Error1.png"));
 	private final ImageIcon ErrorIcon2 = new ImageIcon(
 			MediaPlayer.class.getResource("/javagui/resources/Error2.png"));
+	/*
 	private AudioPlayer audioPlayer= AudioPlayer.player;
 	private AudioStream inputStream;
 	private AudioData data;
 	private AudioDataStream stream=null;
 	private ContinuousAudioDataStream loop=null;
+	*/
 	//private URL url= MessageFrame.class.getClassLoader().getResource("notification.wav");
 	//private AudioClip notification= Applet.newAudioClip(url);
 	
@@ -106,7 +112,7 @@ public class MessageFrame extends JFrame {
 	 * @param messageText	the message to the user
 	 */
 	public MessageFrame(String frameTitle, String messageTitle, String messageText) {
-		notification();
+		//notification();
 		setBounds(658, 605, 320, 120);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -125,7 +131,6 @@ public class MessageFrame extends JFrame {
 		errorLabel.setForeground(Color.RED);
 		errorLabel.setText(messageTitle);
 		contentPane.add(errorLabel);
-		
 		//message to give to user
 		JLabel message = new JLabel(messageText);
 		message.setBounds(10, 50, 300, 30);
@@ -134,7 +139,7 @@ public class MessageFrame extends JFrame {
 		JButton okButton = new JButton("OK");
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				audioPlayer.stop(loop);
+				//audioPlayer.stop(loop);
 				thisFrame.dispose();
 			}
 		});
@@ -146,7 +151,7 @@ public class MessageFrame extends JFrame {
 		return this.errorLabel.getText();
 	}
 	
-	//Play the notification sound
+	/*//Play the notification sound
 	public void notification(){
 		try{
 			inputStream = new AudioStream(new FileInputStream(".notification1.wav"));
@@ -159,4 +164,5 @@ public class MessageFrame extends JFrame {
 			e.printStackTrace();
 		}
 	}
+	*/
 }

@@ -20,19 +20,6 @@ public class GlobalProjectFolder extends SwingWorker<Object,Integer>{
 		Process process=builder.start();
 		process.waitFor();
 		process.destroy();
-		//Go to the Throwable_dpha010 folder
-		/*String cmdDirect= "echo '~USER'";
-		ProcessBuilder builderDirect= new ProcessBuilder("/bin/bash","-c", cmdDirect);
-		Process processDirect=builderDirect.start();
-		InputStream out= processDirect.getInputStream();
-		BufferedReader bf=new BufferedReader(new InputStreamReader(out));
-		String line;
-		while((line=bf.readLine())!=null){
-			System.out.println(line);
-			publish();
-		}
-		processDirect.waitFor();
-		processDirect.destroy();*/
 		return null;
 	}
 	@Override
