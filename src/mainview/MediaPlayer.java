@@ -624,6 +624,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		// set Frame
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MediaPlayer.class.getResource("/javagui/resources/logo.jpg")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
 		setBounds(100, 100, 1330, 830);
 		setContentPane(contentPane);
 		setVisible(true);
