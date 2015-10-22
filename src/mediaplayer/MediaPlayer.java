@@ -248,6 +248,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		// pick a video file to play
 		openVideo.setBounds(40, 40, 65, 45);
 		openVideo.setText("Open");
+		openVideo.setFont(new Font("Time New Roman", Font.BOLD,16));
+		openVideo.setForeground(Color.BLUE);
 		openVideo.setToolTipText("Open a Video File");
 		openVideo.addActionListener(this);
 		controls.add(openVideo);
@@ -293,7 +295,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		//Option button
 		option.setBackground(new Color(250, 250, 250));
 		option.setBounds(117, 40, 70, 45);
-		option.setToolTipText("Resize the Screen and Change the Speed of the Video");
+		option.setToolTipText("Options: Change the Speed of the Video");
 		controls.add(option);
 		option.addActionListener(this);
 
@@ -353,7 +355,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		// Create button opens new frame and let user create a video file
 		create.setBackground(new Color(0, 0, 0));
 		create.setBounds(780, 60, 65, 40);
-		create.setToolTipText("Open the Creating Video Tools Window");
+		create.setToolTipText("Hide/Show the merge audio and video panel");
 		speech.add(create);
 		
 		//rate spinner
@@ -417,6 +419,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 		//Video file browse button
 		videoBrowse.setBounds(346, 45, 75, 25);
+		videoBrowse.setToolTipText("Look for a video file");
 		filesPanel.add(videoBrowse);
 		videoBrowse.addActionListener(this);
 		
@@ -431,6 +434,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 		//mp3 file browse button
 		mp3Browse.setBounds(346, 120, 75, 25);
+		mp3Browse.setToolTipText("Look for a mp3 file");
 		filesPanel.add(mp3Browse);
 		mp3Browse.addActionListener(this);
 		
@@ -478,6 +482,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 		//set up volume spinner
 		volumeSpnr.setBounds(121, 37, 61, 22);
+		volumeSpnr.setToolTipText("Scale the audio volume");
 		audioEffects.add(volumeSpnr);
 		
 		//Tempo of mp3 / speed
@@ -486,6 +491,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 		//set up tempo spinner
 		tempoSpnr.setBounds(121, 80, 61, 22);
+		tempoSpnr.setToolTipText("Scale the audio tempo");
 		audioEffects.add(tempoSpnr);
 		
 		//Echo label
@@ -494,6 +500,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 		// set up the echo checkbox
 		echoCheckBox.setBounds(139, 124, 25, 25);
+		echoCheckBox.setToolTipText("Echo effect for the audio");
 		audioEffects.add(echoCheckBox);
 		
 		// set up the Video effects panel
@@ -512,32 +519,36 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		lblFps.setBounds(12, 41, 70, 16);
 		videoEffects.add(lblFps);
 		
+		//set up frame per second spinner
+		fpsSpnr.setBounds(128, 38, 61, 22);
+		fpsSpnr.setToolTipText("Frame rate for the new video");
+		videoEffects.add(fpsSpnr);
+		
 		//video transpose label
 		lblTranspose.setBounds(12, 79, 80, 16);
 		videoEffects.add(lblTranspose);
 		
 		//video transpose Spinner
 		transposeSpnr.setBounds(128,78,61,22);
+		transposeSpnr.setToolTipText("Rotate the video by specified degree");
 		videoEffects.add(transposeSpnr);
 		
 		//video strip label
 		lblStrip.setBounds(12, 120, 70, 16);
 		videoEffects.add(lblStrip);
+		
 		//strip audio check box
 		stripCheckBox.setBounds(150, 121, 25, 25);
+		stripCheckBox.setToolTipText("Strip the audio from the original video");
 		videoEffects.add(stripCheckBox);
 		
 		//negate video color label
 		lblNegate.setBounds(12, 165, 70, 16);
 		videoEffects.add(lblNegate);
 		
-		//set up frame per second spinner
-		fpsSpnr.setBounds(128, 38, 61, 22);
-		videoEffects.add(fpsSpnr);
-		
-		
 		//Negate the color of the video checkbox
 		negateCheckBox.setBounds(150, 161, 25, 25);
+		negateCheckBox.setToolTipText("Change the color intensities to opposites");
 		videoEffects.add(negateCheckBox);
 		
 		//set up effects label
@@ -583,27 +594,32 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 		//Browse for directory button
 		dirBrowse.setBounds(330, 211, 75, 25);
+		dirBrowse.setToolTipText("Look for a directory");
 		confirmPanel.add(dirBrowse);
 		dirBrowse.addActionListener(this);
 		
 		//file extensions combo box
 		extensions.setModel(new DefaultComboBoxModel(new String[] {".avi"}));
+		extensions.setToolTipText("Choose video file extension");
 		extensions.setBounds(330, 167, 75, 22);
 		confirmPanel.add(extensions);
 		
 		//play the video when finished?
 		playVideoCheckBox.setBounds(94, 243, 240, 25);
+		playVideoCheckBox.setToolTipText("Play the video right when its created");
 		confirmPanel.add(playVideoCheckBox);
 		
 		//set up confirm button
 		confirm.setBounds(120, 290, 200, 45);
 		confirm.setIcon(tickIcon);
+		confirm.setToolTipText("Start merging the mp3 files and the video file");
 		confirmPanel.add(confirm);
 		confirm.addActionListener(this);
 	
 		//table of time points
 		model.setColumnIdentifiers(collumns);
 		table.setModel(model);
+		table.setToolTipText("Mp3 files getting prepared for merge operation");
 		scroll=new JScrollPane(table);
 		scroll.setBounds(25, 10, 400, 110);
 		table.getColumnModel().getColumn(0).setPreferredWidth(150);
