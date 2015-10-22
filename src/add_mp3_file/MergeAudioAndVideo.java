@@ -19,7 +19,7 @@ import mainview.MediaPlayer;
 
 public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 	/**
-	 * MergeAudioAndVideo merges audio files with video files at specific time points
+	 * MergeAudioAndVideo merges audio files with video files at specific time points and with user chosen effects
 	 */
 	private ArrayList<String> mp3Files= null;
 	private ArrayList<String> startTimes= null;
@@ -65,7 +65,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 	@Override
 	protected Object doInBackground() throws Exception {
 		timeConvertor(); // Convert all start time to second
-		String f= System.getProperty("user.home")+"/Throwable_dpha010";
+		String f= mediaPlayer.getProjectPath();
 		if(effects!=null){
 			if((Boolean)effects.get(5)){
 				
@@ -92,24 +92,42 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 		//Video effects
 		if(effects!=null){
 			if(vidFile.equals(f+"/tmp.avi")){
-				if(!(Boolean)effects.get(4) && !(Boolean)effects.get(6)){
-					cmdOutputFile=cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
-				}else if((Boolean)effects.get(4) && !(Boolean)effects.get(6)){
-					cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf transpose=1 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
-				}else if (!(Boolean)effects.get(4) && (Boolean)effects.get(6)){
-					cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf negate -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
-				}else{
-					cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf negate,transpose=1 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+				if(!(Boolean)effects.get(6)){
+					if((Integer)effects.get(4)==4){
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}else if((Integer)effects.get(4)==1 || (Integer)effects.get(4)==5){
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf transpose=1 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}else{
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf transpose=0 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}
+					
+				}else if ( (Boolean)effects.get(6)){
+					if((Integer)effects.get(4)==4){
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf negate -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}else if((Integer)effects.get(4)==1 || (Integer)effects.get(4)==5){
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf negate,transpose=1 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}else{
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf negate,transpose=0 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}
 				}
 			}else{
-				if(!(Boolean)effects.get(4) && !(Boolean)effects.get(6)){
-					cmdOutputFile=cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
-				}else if((Boolean)effects.get(4) && !(Boolean)effects.get(6)){
-					cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -vf transpose=1 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
-				}else if (!(Boolean)effects.get(4) && (Boolean)effects.get(6)){
-					cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -vf negate -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
-				}else{
-					cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -vf negate,transpose=1 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+				if(!(Boolean)effects.get(6)){
+					if((Integer)effects.get(4)==4){
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}else if((Integer)effects.get(4)==1 || (Integer)effects.get(4)==5){
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -vf transpose=1 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}else{
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -vf transpose=0 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}
+					
+				}else if ( (Boolean)effects.get(6)){
+					if((Integer)effects.get(4)==4){
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -vf negate -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}else if((Integer)effects.get(4)==1 || (Integer)effects.get(4)==5){
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -vf negate,transpose=1 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}else{
+						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -vf negate,transpose=0 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
+					}
 				}
 			}
 			intermidiateFiles.add(f+"/tmp1.avi");
@@ -119,7 +137,6 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 		//Execute the mp3 files commands
 		commands.add(cmdOutputFile);
 		for(String s: commands){
-			System.out.println(s);
 			ProcessBuilder buildMp3Files= new ProcessBuilder("/bin/bash","-c",s);
 			Process processMp3Files=buildMp3Files.start();
 			//Read input from error stream, see when the file is done.
@@ -133,13 +150,29 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 		}
 		
 		if(effects!=null){
+			int i=1;
+			if((Integer)effects.get(4)==5){
+				String cmd180Flip= "ffmpeg -y -i "+f+"/tmp1.avi -vf transpose=1 "+f+"/tmp2.avi";
+				ProcessBuilder build180Flip= new ProcessBuilder("/bin/bash","-c", cmd180Flip);
+				Process process180Flip= build180Flip.start();
+				//Read input from error stream, see when the file is done.
+				InputStream in= process180Flip.getErrorStream();
+				BufferedReader b=new BufferedReader(new InputStreamReader(in));
+				while((b.readLine())!=null){
+					publish();
+				}
+				intermidiateFiles.add(f+"/tmp2.avi");
+				i++;
+				process180Flip.waitFor();
+				process180Flip.destroy();
+			}
+			
 			String cmdAudioEffects;
 			if(!(Boolean)effects.get(2)){
-				cmdAudioEffects= "ffmpeg -y -i "+f+"/tmp1.avi"+" -af volume="+(Double)effects.get(0)+",atempo="+(Double)effects.get(1)+ " " +outputFile;
+				cmdAudioEffects= "ffmpeg -y -i "+f+"/tmp"+i+".avi"+" -af volume="+(Double)effects.get(0)+",atempo="+(Double)effects.get(1)+ " " +outputFile;
 			}else{
-				cmdAudioEffects= "ffmpeg -y -i "+f+"/tmp1.avi"+" -af volume="+(Double)effects.get(0)+",atempo="+(Double)effects.get(1)+ ",aecho " +outputFile;
+				cmdAudioEffects= "ffmpeg -y -i "+f+"/tmp"+i+".avi"+" -af volume="+(Double)effects.get(0)+",atempo="+(Double)effects.get(1)+ ",aecho " +outputFile;
 			}
-			System.out.println(cmdAudioEffects);
 			ProcessBuilder buildNewFile= new ProcessBuilder("/bin/bash","-c",cmdAudioEffects);
 			Process processNewFile=buildNewFile.start();
 			//Read input from error stream, see when the file is done.
@@ -160,7 +193,9 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 	protected void process(List<Integer> chunks){
 		
 		this.statuslbl.setText("Creating "+outputName.getName()+", please wait...");
-		n+=5;
+		if(!(n>=480)){
+			n+=5;
+		}
 		mediaPlayer.getProgressBar().setValue(n);
 	}
 	

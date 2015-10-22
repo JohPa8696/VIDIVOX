@@ -6,16 +6,25 @@ import java.io.InputStreamReader;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import mainview.MediaPlayer;
 
 public class GlobalProjectFolder extends SwingWorker<Object,Integer>{
 	/**
 	 * Global ProjectFolder create the project folder in the home directory.
 	 */
+	private String directoryToCreate;
+	
+	public GlobalProjectFolder(String path){
+		this.directoryToCreate=path;
+	}
 
 	@Override
 	protected Object doInBackground() throws Exception {
 		//Create the folder Throwable_dpha010
-		String cmdFolder= "mkdir ~/Throwable_dpha010";
+		String cmdFolder= "mkdir "+directoryToCreate;
 		ProcessBuilder builder= new ProcessBuilder("/bin/bash","-c", cmdFolder);
 		Process process=builder.start();
 		process.waitFor();
@@ -24,7 +33,8 @@ public class GlobalProjectFolder extends SwingWorker<Object,Integer>{
 	}
 	@Override
 	protected void done(){
-		JOptionPane.showMessageDialog(null, "The folder \"Throwable_dpha010\" has been created in your home directory");
+		JOptionPane.showMessageDialog(null, "The folder "+directoryToCreate+" has been created!");
+		
 	}
 
 }

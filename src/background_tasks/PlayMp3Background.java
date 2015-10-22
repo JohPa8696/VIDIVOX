@@ -7,7 +7,7 @@ import javax.swing.SwingWorker;
 
 public class PlayMp3Background extends SwingWorker<Object,Integer>{
 	/**
-	 * Play selected mp3 file in the background
+	 * Play selected mp3 files in the background
 	 */
 	private String fileName;
 	private int pid; 

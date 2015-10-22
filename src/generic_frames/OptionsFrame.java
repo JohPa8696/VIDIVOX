@@ -38,8 +38,8 @@ public class OptionsFrame extends JFrame implements ActionListener {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					OptionsFrame window = new OptionsFrame();
-					window.setVisible(true);
+					//OptionsFrame window = new OptionsFrame();
+					//window.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -49,9 +49,11 @@ public class OptionsFrame extends JFrame implements ActionListener {
 
 	
 	/**
-	 * Create the application.
+	 * Constructor create the Option Frame
+	 * @param x
+	 * @param y
 	 */
-	public OptionsFrame() {
+	public OptionsFrame(int x, int y) {
 		//contentPane
 		contentPane.setBackground(new Color(250, 250, 250));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -92,10 +94,11 @@ public class OptionsFrame extends JFrame implements ActionListener {
 		
 		//Set up the Frame
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(220, 730, 320, 80);
+		setBounds(x, y, 320, 80);
 		setUndecorated(true);
 		setOpacity(0.8F);
 		setContentPane(contentPane);
+		setResizable(false);
 		setVisible(true);
 	}
 

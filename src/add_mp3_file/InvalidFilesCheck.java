@@ -22,6 +22,8 @@ public class InvalidFilesCheck {
 	private boolean isValid3=true;
 	private ArrayList<String> mp3Files= new ArrayList<String>();
 	private ArrayList<String> startTimes= new ArrayList<String>();
+	private int frameXCoord;
+	private int frameYCoord;
 	/**
 	 * Constructor with inputs are the file names entered by user
 	 * @param videoFile
@@ -73,34 +75,34 @@ public class InvalidFilesCheck {
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 1",
+				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 1",
 						"Please fill in blank fields");
 			} else if (!video.exists()) {
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 2a", video.getName() + " does not exist");
+				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 2a", video.getName() + " does not exist");
 			} else if (video.isDirectory()) {
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 3a", video.getName() + " is a directory");
+				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 3a", video.getName() + " is a directory");
 			} else if (!directory.exists()) {
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 6", directory
+				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 6", directory
 						.toString() + " does not exist");
 			} else if (newFile.exists()) {
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 5a", newFile.getName() + " already exists");
+				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 5a", newFile.getName() + " already exists");
 			} else if (!checkFileName.getName().matches(pattern)) {
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 5b", newFile.getName() + " is an invalid name");
+				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 5b", newFile.getName() + " is an invalid name");
 			}
 			isValid1=false;
 			mf.setVisible(true);
@@ -118,14 +120,14 @@ public class InvalidFilesCheck {
 				if (mf != null) {
 				mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 3b", mp3.getName() + " is a directory");
+				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 3b", mp3.getName() + " is a directory");
 				isValid2=false;
 				mf.setVisible(true);
 			} else if (!mp3.exists()) {
 				if (mf != null) {
 					mf.dispose();
 				}	
-				mf = new MessageFrame("Error", "ERROR 2b", mp3.getName() + " does not exist");
+				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 2b", mp3.getName() + " does not exist");
 				isValid2=false;
 				mf.setVisible(true);
 			}
@@ -140,12 +142,12 @@ public class InvalidFilesCheck {
 		for (String s: startTimes){
 			String[] substrings=s.split(":");
 			for(String substring: substrings){
-				if(isInteger(substring)){
+				if(isInteger(substring)&&substring.length()==2){
 				}else{
 					if (mf != null) {
 						mf.dispose();
 					}
-					mf = new MessageFrame("Error", "ERROR 9", "Invalid start time");
+					mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 9", "Invalid start time");
 					isValid3=false;
 					mf.setVisible(true);
 					return isValid3;
@@ -157,14 +159,14 @@ public class InvalidFilesCheck {
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 9", "Invalid start time");
+				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 9", "Invalid start time");
 				isValid3=false;
 				mf.setVisible(true);
 			}else if (sec>=60){
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 9", "Invalid start time");
+				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 9", "Invalid start time");
 				isValid3=false;
 				mf.setVisible(true);		
 			}
@@ -178,4 +180,12 @@ public class InvalidFilesCheck {
 	 * @return true if the string contain only numeric value
 	 */
 	public static boolean isInteger(String string){return string.matches("-?\\d+(\\.\\d+)?");}
+	
+	/**
+	 * Set x and y coordinate of the media player frame
+	 */
+	public void setCoordinates(int x, int y){
+		this.frameXCoord=x;
+		this.frameYCoord=y;
+	}
 }

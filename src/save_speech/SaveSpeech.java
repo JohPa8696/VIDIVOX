@@ -4,16 +4,21 @@ package save_speech;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
+import background_tasks.FilesRemover;
+
 public class SaveSpeech extends SwingWorker<Object, Integer>{
 	/**
-	 * Save the users' input text as synthetic speech with voice, rate and pitch as specified
+	 * Save the users' input text as synthetic speech with voice attributes such as voice, rate and pitch as specified.
+	 * The user can also select a directory to save the file to.
 	 */
+	private ArrayList<String> filesToRemove= new ArrayList<String>();
 	private String message;
 	private String fileName;
 	private JProgressBar progressBar=null;
@@ -24,6 +29,17 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 	private int pitchEnd;
 	private int n=0;
 		
+	/**
+	 * Constructor
+	 * @param message
+	 * @param fileName
+	 * @param statuslbl
+	 * @param progressBar
+	 * @param voice
+	 * @param rate
+	 * @param pitchStart
+	 * @param pitchEnd
+	 */
 	public SaveSpeech (String message, String fileName,JLabel statuslbl, JProgressBar progressBar, String voice, double rate, int pitchStart, int pitchEnd){
 		this.message = message;
 		this.fileName = fileName;
@@ -46,6 +62,8 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", cmdSchemeFile);
 		Process process = builder.start();
+		//add .tmp1.scm to remove list
+		filesToRemove.add(".tmp1.scm");
 		process.waitFor();
 		process.destroy();
 		
@@ -53,6 +71,7 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		String cmdTxtFile= "echo \""+message+"\" > .tmp.txt";
 		ProcessBuilder buildTxt= new ProcessBuilder("/bin/bash","-c", cmdTxtFile);
 		Process processTxt= buildTxt.start();
+		filesToRemove.add(".tmp.txt");
 		processTxt.waitFor();
 		processTxt.destroy();
 		
@@ -60,12 +79,7 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		String cmdWavFile= "text2wave -o .tmp.wav .tmp.txt -eval .tmp1.scm";
 		ProcessBuilder buildWav= new ProcessBuilder("/bin/bash","-c",cmdWavFile);
 		Process processWav= buildWav.start();
-		InputStream out1= processWav.getErrorStream();
-		BufferedReader bf= new BufferedReader(new InputStreamReader(out1));
-		String lin1;
-		while((lin1=bf.readLine())!=null){
-			System.out.println(lin1);
-		}
+		filesToRemove.add(".tmp.wav");
 		processWav.waitFor();
 		processWav.destroy();
 		
@@ -75,10 +89,8 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		Process processMp3 = buildMp3.start();
 		InputStream out= processMp3.getErrorStream();
 		BufferedReader stdout= new BufferedReader(new InputStreamReader(out));
-		String line;
-		while((line=stdout.readLine()) !=null){
+		while(stdout.readLine() !=null){
 			n+=10;
-			System.out.println(line);
 			publish();
 		}
 		
@@ -87,7 +99,10 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 
 		// command used in bash terminal
 		// deletes the temporary file
-		String cmdDeleteTmps = "rm -f .tmp.wav .tmp1.scm .tmp.txt";
+		FilesRemover fr= new FilesRemover(filesToRemove);
+		fr.execute();
+		
+		/*String cmdDeleteTmps = "rm -f .tmp.wav .tmp1.scm .tmp.txt";
 
 		// builds the command and runs it
 		// deletes temporary file
@@ -95,7 +110,7 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		Process processDeleteTxt = builderDeleteTmps.start();
 		processDeleteTxt.waitFor();
 		processDeleteTxt.destroy();
-		
+		*/
 		return null;
 	}
 	

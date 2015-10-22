@@ -42,6 +42,7 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 	private double rate;
 	private int pitchStart;
 	private int pitchEnd;
+	private String projectPath=null;
 	
 	
 	private JFrame thisFrame = this;
@@ -49,25 +50,15 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 	private MessageFrame mf = null;
 	JFileChooser chooser = null;
 
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					SaveSpeechFrame window = new SaveSpeechFrame();
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 	/**
 	 * Create the frame.
 	 */
-	public SaveSpeechFrame() {
+	public SaveSpeechFrame(int x, int y, String path) {
+		setProjectPath(path);
 		addWindowListener(this);
 		setTitle("Save Synthetic Speech");
-		setBounds(290, 725, 510, 180);
+		setBounds(x+190, y+600, 510, 180);
+		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setBackground(new Color(255,255,255));
@@ -99,7 +90,7 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 		contentPane.add(saveTo);
 		saveTo.setColumns(10);
 		if(folder.equals("")){
-			saveTo.setText(System.getProperty("user.home")+"/Throwable_dpha010");
+			saveTo.setText(path);
 		}else{
 			saveTo.setText(folder);
 		}
@@ -126,7 +117,7 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 		if(e.getSource()==browse){
 			if (chooser == null){
 				chooser = new JFileChooser();
-				chooser.setCurrentDirectory(new java.io.File("."));
+				chooser.setCurrentDirectory(new java.io.File(projectPath));
 				chooser.setDialogTitle("Find Folder");
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				chooser.setAcceptAllFileFilterUsed(false);
@@ -158,14 +149,14 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 			if (mf != null){
 				mf.dispose();
 			}
-			mf = new MessageFrame("Error", "Error:", "Invalid Name!");
+			mf = new MessageFrame(getX()+368,getY()-150,"Error", "ERROR 7:", "Invalid Name!");
 			mf.setVisible(true);
 			return;
 		}else if (fileName.equals("")){
 			if (mf != null){
 				mf.dispose();
 			}
-			mf = new MessageFrame("Error", "Error:", "No Name!");
+			mf = new MessageFrame(getX()+368,getY()-150,"Error", "ERROR 1:", "Please enter name for new file!");
 			mf.setVisible(true);
 			return;
 		}
@@ -185,14 +176,14 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 			if(mf != null){
 				mf.dispose();
 			}
-			MessageFrame mf = new MessageFrame("Error", "ERROR 3:", "File Already Exists!");
+			MessageFrame mf = new MessageFrame(getX()+368,getY()-150,"Error", "ERROR 3:", "File Already Exists!");
 			mf.setVisible(true);
 			return;
 		}else if (!tmpDir.exists()){
 			if(mf != null){
 				mf.dispose();
 			}
-			MessageFrame mf = new MessageFrame("Error", "ERROR 4", "Folder does not Exists!");
+			MessageFrame mf = new MessageFrame(getX()+368,getY()-150,"Error", "ERROR 4", "Folder does not Exists!");
 			mf.setVisible(true);
 			return;
 		}
@@ -221,7 +212,7 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 		this.pitchEnd=pitchEnd;
 	}
 	
-	
+	public void setProjectPath(String path){ this.projectPath=path;}
 	@Override
 	public void windowClosed(WindowEvent arg0) {
 		fileName= nameOfFile.getText();

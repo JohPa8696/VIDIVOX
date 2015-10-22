@@ -15,7 +15,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import add_mp3_file.MergeAudioAndVideo;
-import add_mp3_file.AddMp3FileFrame;
 import add_mp3_file.InvalidFilesCheck;
 import background_tasks.BackgroundVoice;
 import background_tasks.GetMediaFileDurationTask;
@@ -27,6 +26,7 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -114,6 +114,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private JSpinner rateSpnr = new JSpinner( new SpinnerNumberModel(new Double(1.5),new Double(0.1),new Double(5.0),new Double(0.1)));
 	private JSpinner volumeSpnr = new JSpinner(new SpinnerNumberModel(new Double(1.0),new Double(0.1),new Double(2.0),new Double(0.1)));
 	private JSpinner tempoSpnr = new JSpinner(new SpinnerNumberModel(new Double(1.0),new Double(0.5),new Double(2.0),new Double(0.5)));
+	private JSpinner transposeSpnr = new JSpinner(new SpinnerNumberModel(new Integer(0),new Integer(0),new Integer(270),new Integer(90)));
 	private JSpinner fpsSpnr = new JSpinner(new SpinnerNumberModel(new Integer(30),new Integer(5),new Integer(60),new Integer(5)));
 
 	
@@ -166,7 +167,6 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private JCheckBox echoCheckBox = new JCheckBox("");
 	private JCheckBox negateCheckBox = new JCheckBox("");
 	private JCheckBox stripCheckBox = new JCheckBox("");
-	private JCheckBox transposeCheckBox = new JCheckBox("");
 	private final JCheckBox playVideoCheckBox = new JCheckBox("Play the video when finished");
 	
 	//tables
@@ -188,20 +188,25 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private final EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
 	private final EmbeddedMediaPlayer video = mediaPlayerComponent.getMediaPlayer();
 	
+	//ArrayList
+	private ArrayList<String> mp3FilesPaths= new ArrayList<String>();
 	
 	//Strings
 	private final String[] pitchRange={"50 hz", "60 hz", "70 hz", "80 hz", "90 hz", "100 hz", "110 hz", "120 hz", "130 hz", "140 hz", 
 							"150 hz", "160 hz", "170 hz", "180 hz", "190 hz", "200 hz", "210 hz", "220 hz", "230 hz", "240 hz", "250 hz"};
 	private String videoTitle = null;
+	private String projectPath=null;
 	//Table with scrollPane
 	private JScrollPane scroll;
 	private DefaultTableModel model= new DefaultTableModel();
-	private Object[] collumns= {"Mp3 files", "Start time"};
+	private Object[] collumns= {"Mp3 files", "Duration","Start time"};
+	
+	
 	/**
 	 * Create the frame.
 	 */
-	public MediaPlayer() {
-
+	public MediaPlayer(String path) {
+		setProjectPath(path);
 		// Setting contentPane;
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(null);
@@ -513,9 +518,9 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		lblTranspose.setBounds(12, 79, 80, 16);
 		videoEffects.add(lblTranspose);
 		
-		//video transpose check box
-		transposeCheckBox.setBounds(150,78,25,25);
-		videoEffects.add(transposeCheckBox);
+		//video transpose Spinner
+		transposeSpnr.setBounds(128,78,61,22);
+		videoEffects.add(transposeSpnr);
 		
 		//video strip label
 		lblStrip.setBounds(12, 120, 70, 16);
@@ -575,11 +580,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		saveDirectory.setColumns(10);
 		saveDirectory.setBounds(94, 212, 224, 22);
 		confirmPanel.add(saveDirectory);
-		//try {
-			saveDirectory.setText(System.getProperty("user.home")+"/Throwable_dpha010");
-		//} catch (IOException e1) {
-			//e1.printStackTrace();
-		//}
+		//Set the current project path
+		saveDirectory.setText(projectPath);
 		
 		//Browse for directory button
 		dirBrowse.setBounds(330, 211, 75, 25);
@@ -606,7 +608,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		table.setModel(model);
 		scroll=new JScrollPane(table);
 		scroll.setBounds(25, 10, 400, 110);
-		table.getColumnModel().getColumn(0).setPreferredWidth(300);
+		table.getColumnModel().getColumn(0).setPreferredWidth(150);
 		confirmPanel.add(scroll);
 		
 		//Play the selected mp3 file button
@@ -625,7 +627,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MediaPlayer.class.getResource("/javagui/resources/logo.jpg")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
-		setBounds(100, 100, 1330, 830);
+		setBounds(400, 100, 1330, 830);
 		setResizable(false);
 		setContentPane(contentPane);
 		setVisible(true);
@@ -671,9 +673,10 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			videoFileChooser(openVideo);
 		} else if (e.getSource()==option){	   // Option frame, choose Rate and mode
 			if(op!=null){
+				op.setLocation(getX()+185,getY()+603);
 				op.setVisible(true);
 			}else{
-				op= new OptionsFrame();
+				op= new OptionsFrame(getX()+185,getY()+603);
 				op.setMediaPlayer(this);
 			}
 		} else if (e.getSource() == play) { 	// Play the video
@@ -681,7 +684,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 4",
+				mf = new MessageFrame(getX()+558,getY()+478,"Error", "ERROR 4",
 						"No file has been selected");
 				mf.setVisible(true);
 			}
@@ -743,7 +746,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 7", "Number of words: "
+				mf = new MessageFrame(getX()+558,getY()+478,"Error", "ERROR 7", "Number of words: "
 						+ wordCount() + ". Maximum is 30.");
 				mf.setVisible(true);
 				return;
@@ -751,14 +754,14 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 1",
+				mf = new MessageFrame(getX()+558,getY()+478,"Error", "ERROR 1",
 						"Text field must not be empty!");
 				mf.setVisible(true);
 				return;
 			} else if (ssf != null) {
 				ssf.dispose();
 			}
-			ssf = new SaveSpeechFrame();
+			ssf = new SaveSpeechFrame(getX(),getY(),projectPath);
 			ssf.setVisible(true);
 			String[] pitch= spinnerTranslate();
 			String voice=(String)voiceOptions.getSelectedItem();
@@ -775,11 +778,11 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			
 			if(create.getText().equals("Hide")){
 				mergeAudio.setVisible(false);
-				this.setBounds(100, 100, 880, 830);
+				this.setBounds(getX(), getY()-28, 880, 830);
 				create.setText("Show");
 			}else{
 				mergeAudio.setVisible(true);
-				this.setBounds(100, 100, 1330, 830);
+				this.setBounds(getX(), getY()-28, 1330, 830);
 				create.setText("Hide");
 			}
 		} else if(e.getSource() == videoBrowse){
@@ -789,9 +792,12 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		}else if(e.getSource() == dirBrowse){
 			directoryChooser();
 		}else if(e.getSource()== addToTable){
-			Object[] row = new Object[2];
-			row[0]=mp3Filetf.getText();
-			row[1]="00:00";
+			File file= new File(mp3Filetf.getText());
+			mp3FilesPaths.add(mp3Filetf.getText());
+			Object[] row = new Object[3];
+			row[0]=file.getName();
+			row[1]=mp3Duration.getText();
+			row[2]="00:00";
 			model.addRow(row);
 		}else if(e.getSource()== enableEffects){
 			if(enableEffects.getText().equals("Enable")){
@@ -808,15 +814,15 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			ArrayList<String> startTimes= new ArrayList<String>();
 			for(int i: selectedRows){
 				//Get the name of mp3 files from selected row
-				mp3Files.add((String)table.getValueAt(i, 0));
-				startTimes.add((String)table.getValueAt(i, 1));
+				mp3Files.add(mp3FilesPaths.get(i));
+				startTimes.add((String)table.getValueAt(i, 2));
 			}
 			//Check if user have selected at least 1 video file
 			if(mp3Files.isEmpty()){
 				if (mf != null) {
 					mf.dispose();
 				}
-				mf = new MessageFrame("Error", "ERROR 8",
+				mf = new MessageFrame(getX()+558,getY()+478,"Error", "ERROR 4",
 						"No mp3 file have been selected!");
 				mf.setVisible(true);
 				return;
@@ -824,11 +830,11 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			//Check if the inputs are valid
 			InvalidFilesCheck ifc1= new InvalidFilesCheck(videoFiletf.getText(),saveDirectory.getText()
 					+ System.getProperty("file.separator")+ newFileName.getText() + ".avi", saveDirectory.getText());
-			
+			ifc1.setCoordinates(getX()+558,getY()+478);
 			InvalidFilesCheck ifc2= new InvalidFilesCheck(mp3Files); 
-			
+			ifc2.setCoordinates(getX()+558,getY()+478);
 			InvalidFilesCheck ifc3= new InvalidFilesCheck(startTimes, videoDuration.getText());
-			
+			ifc3.setCoordinates(getX()+558,getY()+478);
 			if(!ifc1.ErrorChecking() || !ifc2.mp3FilesCheck() || !ifc3.startTimesCheck()){
 			}else{	
 				ArrayList<Object> effects=null;
@@ -851,15 +857,17 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			int[] selectedRows=table.getSelectedRows();
 			for(int i: selectedRows){
 				//play the mp3file at each selected row
-				PlayMp3Background pmb= new PlayMp3Background((String)table.getValueAt(i, 0));
+				PlayMp3Background pmb= new PlayMp3Background(mp3FilesPaths.get(i));
 				pmb.execute();
 			}
 		}else if(e.getSource()== deleteMp3Files){
 			//Get the index of selected rows
 			int[] selectedRows=table.getSelectedRows();
+			int j=0;
 			for(int i: selectedRows){
-				//remove it from the table
-				model.removeRow(i);
+				mp3FilesPaths.remove(i-j);
+				model.removeRow(i-j);
+				j++;
 			}
 		}
 	}
@@ -934,7 +942,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		tempoSpnr.setEnabled(true);
 		echoCheckBox.setEnabled(true);
 		fpsSpnr.setEnabled(true);
-		transposeCheckBox.setEnabled(true);
+		transposeSpnr.setEnabled(true);
 		stripCheckBox.setEnabled(true);
 		negateCheckBox.setEnabled(true);
 	}
@@ -944,7 +952,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		tempoSpnr.setEnabled(false);
 		echoCheckBox.setEnabled(false);
 		fpsSpnr.setEnabled(false);
-		transposeCheckBox.setEnabled(false);
+		transposeSpnr.setEnabled(false);
 		stripCheckBox.setEnabled(false);
 		negateCheckBox.setEnabled(false);
 	}
@@ -955,7 +963,16 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		effects.add(tempoSpnr.getValue());
 		effects.add(echoCheckBox.isSelected());
 		effects.add(fpsSpnr.getValue());
-		effects.add(transposeCheckBox.isSelected());
+		int transposeDeg=(Integer)transposeSpnr.getValue();
+		if(transposeDeg==0){
+			effects.add(new Integer(4));
+		}else if(transposeDeg==90){
+			effects.add(new Integer(1));
+		}else if(transposeDeg==180){
+			effects.add(new Integer(5));
+		}else{
+			effects.add(new Integer(0));
+		}
 		effects.add(stripCheckBox.isSelected());
 		effects.add(negateCheckBox.isSelected());
 		return effects;
@@ -981,7 +998,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			FileNameExtensionFilter filter;
 			filter = new FileNameExtensionFilter("Video File", "avi", "mp4", "mkv");
 			chooser.setDialogTitle("Choose a Video File");
-			chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home")));
+			chooser.setCurrentDirectory(new java.io.File(projectPath));
 			chooser.setFileFilter((javax.swing.filechooser.FileFilter) filter);
 			chooser.setAcceptAllFileFilterUsed(false);
 			
@@ -1013,7 +1030,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			chooser = new JFileChooser();
 			FileNameExtensionFilter filter= new FileNameExtensionFilter("Audio File", "mp3");
 			chooser.setDialogTitle("Choose an Audito File");
-			chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home")+"/Throwable_dpha010"));
+			chooser.setCurrentDirectory(new java.io.File(projectPath));
 			chooser.setFileFilter((javax.swing.filechooser.FileFilter) filter);
 			chooser.setAcceptAllFileFilterUsed(false);
 			if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -1033,7 +1050,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	public void directoryChooser() {
 		if (chooser == null) {
 			chooser = new JFileChooser();
-			chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home")+"/Throwable_dpha010"));
+			chooser.setCurrentDirectory(new java.io.File(projectPath));
 			chooser.setDialogTitle("Find Directory");
 			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			chooser.setAcceptAllFileFilterUsed(false);
@@ -1044,7 +1061,12 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			chooser = null;
 		}
 	}
-	// set the video title
+	
+	/*
+	 * Getters and setters
+	 */
+	public void setProjectPath(String path){ this.projectPath=path;}
+	public String getProjectPath(){ return this.projectPath;}
 	public void setVideoTitle(String title) {this.videoTitle = title;}
 	public String getVideoTitle() {return this.videoTitle;}
 	public String getTextMessage() {return text.getText();}

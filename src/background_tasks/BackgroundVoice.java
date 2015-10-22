@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
@@ -12,11 +13,12 @@ import javax.swing.SwingWorker;
 import mainview.MediaPlayer;
 
 /**
- * Creates a voice that runs in the background which can be canceled
- * 
+ * Creates a festival voice with voice, rate and pitch features specified by user. The voice can also be canceled
+ * if use click the cancel button.
  */
 public class BackgroundVoice extends SwingWorker<Object, Integer> {
 	// Instance variables
+	private ArrayList<String> filesToRemove= new ArrayList<String>();
 	private String message; // message to be said
 	private int pid; // task id
 	private MediaPlayer mediaPlayer=null;
@@ -32,9 +34,13 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 	}
 
 	/**
-	 * Contructor
-	 * 
-	 * @param message message that the user provides
+	 * Custom constructor take inputs as attributes of the festival voice : the message, voice, rate, pitch at the start and end. 
+	 * @param message
+	 * @param mediaPlayer
+	 * @param voice
+	 * @param rate
+	 * @param start
+	 * @param end
 	 */
 	public BackgroundVoice(String message, MediaPlayer mediaPlayer, String voice, double rate, int start,int end) {
 		this.message = message;
@@ -68,7 +74,8 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 		Process process1= builder1.start();
 		process1.waitFor();
 		process1.destroy();
-		
+		//Add the .tmp.scm file to the remove list
+		filesToRemove.add(".tmp.scm");
 		//Execute the scm file
 		String cmd2= "festival -b '.tmp.scm'";
 		ProcessBuilder builder2= new ProcessBuilder("/bin/bash","-c", cmd2);
@@ -127,17 +134,10 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 		} catch (ExecutionException e1) {
 		}
 
-		//Destroy teh temporary scheme file
-		String cmd3= "rm -f .tmp.scm";
-		ProcessBuilder builder4= new ProcessBuilder("/bin/bash","-c", cmd3);
-		Process process4;
-		try {
-			process4 = builder4.start();
-			process4.waitFor();
-			process4.destroy();
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
+		//Destroy the temporary scheme file
+		FilesRemover fr= new FilesRemover(filesToRemove);
+		fr.execute();
+		
 		this.mediaPlayer.getSpeakButton().setText("");
 		this.mediaPlayer.getSpeakButton().setIcon(mediaPlayer.getSpeakIcon());
 	}
