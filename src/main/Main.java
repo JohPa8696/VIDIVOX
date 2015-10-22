@@ -1,21 +1,21 @@
-package mainview;
+package main;
 
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
-
-import background_tasks.GlobalProjectFolder;
-import generic_frames.ProjectSelectFrame;
+import genericframes.launcher.ProjectSelectFrame;
 import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
+
+
+/**
+ * Main Class launches the launcher frame and ask user for a project directory
+ */
 public class Main {
-	/**
-	 * Main Class launches the Media Player Window
-	 */
+	
 	
 	public static void main(String[] args){
 		
@@ -29,9 +29,12 @@ public class Main {
 			e.printStackTrace();
 		}
 		
-		//Create project frame
-		ProjectSelectFrame pf= new ProjectSelectFrame();
-		pf.setVisible(true);
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new ProjectSelectFrame().setVisible(true);
+			}
+		});
 	}
 	
 

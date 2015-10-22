@@ -1,4 +1,4 @@
-package background_tasks;
+package swingworkers.mediaactions;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -7,22 +7,22 @@ import java.io.InputStreamReader;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 
+/**
+ * GetMediaFileDurationTask get the duration of a video file (avi, mp4  or mkv) or and mp3 file using a bash command
+ * and return the duration back to the GUI
+ */
 public class GetMediaFileDurationTask extends SwingWorker<Integer,Object> {
-	
-	/**
-	 * GetMediaFileDurationTask get the duration of a video file (avi, mp4  or mkv) or and mp3 file using a bash command
-	 * and return the duration back to the GUI
-	 */
 	
 	private String videoFile;
 	private String duration;
 	private JLabel durationLabel=null;
 	String line=null;
-	/**
-	 * Constructor
-	 * @param videoFile
-	 */
 	
+	/**
+	 * Custom constructor
+	 * @param videoFile
+	 * @param label
+	 */
 	public GetMediaFileDurationTask(String videoFile, JLabel label){
 		this.videoFile= videoFile;
 		this.durationLabel=label;

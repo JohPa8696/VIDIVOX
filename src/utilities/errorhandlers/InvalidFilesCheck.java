@@ -1,15 +1,15 @@
-package add_mp3_file;
+package utilities.errorhandlers;
 
 import java.io.File;
 import java.util.ArrayList;
+import genericframes.helperframes.MessageFrame;
 
-import generic_frames.MessageFrame;
-
+/**
+ * InvalidFileCheck check if the files that the user entered is invalid and Open an error massage to let user know
+ * Otherwise it returns a true boolean value.
+ */
 public class InvalidFilesCheck {
-	/**
-	 * InvalidFileCheck check if the files that the user entered is invalid and Open an error massage to let user know
-	 * Otherwise it returns a true boolean value.
-	 */
+	
 	private String videoFile;
 	private String newFile;
 	private String directory;

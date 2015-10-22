@@ -1,26 +1,24 @@
-package add_mp3_file;
+package swingworkers.merger;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
-
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
+import swingworkers.filesrehandlers.FilesRemover;
+import swingworkers.mediaactions.GetMediaFileDurationTask;
+import mediaplayer.MediaPlayer;
 
-import background_tasks.FilesRemover;
-import background_tasks.GetMediaFileDurationTask;
-import mainview.MediaPlayer;
-
+/**
+ * MergeAudioAndVideo merges audio files with video files at specific time points and with user chosen effects
+ */
 public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
-	/**
-	 * MergeAudioAndVideo merges audio files with video files at specific time points and with user chosen effects
-	 */
+	
+	
 	private ArrayList<String> mp3Files= null;
 	private ArrayList<String> startTimes= null;
 	private ArrayList<Integer> startTimesInSecond= new ArrayList<Integer>();

@@ -1,4 +1,4 @@
-package background_tasks;
+package swingworkers.mediaactions;
 
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -7,10 +7,12 @@ import java.util.concurrent.ExecutionException;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import javax.swing.SwingWorker;
 
+/**
+ * Skipbackground take the skip the video forward or backward by 3 seconds whenever the fast forward or backwards is triggered
+ */
+
 public class SkipBackground extends SwingWorker<Object,Integer>{
-	/**
-	 * Skipbackground take the skip the video forward or backward by 3 seconds whenever the fast forward or backwards is triggered
-	 */
+
 	private EmbeddedMediaPlayer video;
 	private boolean skipForward;
 	

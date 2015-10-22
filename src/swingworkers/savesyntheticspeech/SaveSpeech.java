@@ -1,4 +1,4 @@
-package save_speech;
+package swingworkers.savesyntheticspeech;
 
 
 import java.io.BufferedReader;
@@ -6,18 +6,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
+import swingworkers.filesrehandlers.FilesRemover;
 
-import background_tasks.FilesRemover;
 
+/**
+ * Save the users' input text as synthetic speech with voice attributes such as voice, rate and pitch as specified.
+ * The user can also select a directory to save the file to.
+ */
 public class SaveSpeech extends SwingWorker<Object, Integer>{
-	/**
-	 * Save the users' input text as synthetic speech with voice attributes such as voice, rate and pitch as specified.
-	 * The user can also select a directory to save the file to.
-	 */
+
 	private ArrayList<String> filesToRemove= new ArrayList<String>();
 	private String message;
 	private String fileName;
@@ -101,16 +101,7 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 		// deletes the temporary file
 		FilesRemover fr= new FilesRemover(filesToRemove);
 		fr.execute();
-		
-		/*String cmdDeleteTmps = "rm -f .tmp.wav .tmp1.scm .tmp.txt";
-
-		// builds the command and runs it
-		// deletes temporary file
-		ProcessBuilder builderDeleteTmps = new ProcessBuilder("/bin/bash", "-c", cmdDeleteTmps);
-		Process processDeleteTxt = builderDeleteTmps.start();
-		processDeleteTxt.waitFor();
-		processDeleteTxt.destroy();
-		*/
+	
 		return null;
 	}
 	

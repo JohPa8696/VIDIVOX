@@ -1,13 +1,13 @@
-package background_tasks;
+package swingworkers.filesrehandlers;
 
 import java.util.ArrayList;
 
 import javax.swing.SwingWorker;
 
+/**
+ * FilesRemover remove all intermidiate and one-time use files 
+ */
 public class FilesRemover extends SwingWorker<Object, Integer>{
-	/**
-	 * FilesRemover remove all intermidiate and one-time use files 
-	 */
 	
 	ArrayList<String> filesToRemove= new ArrayList<String>();
 	

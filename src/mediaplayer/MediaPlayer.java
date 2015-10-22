@@ -1,7 +1,9 @@
-package mainview;
+package mediaplayer;
 
-import generic_frames.MessageFrame;
-import generic_frames.OptionsFrame;
+import genericframes.helperframes.*;
+import swingworkers.festival.BackgroundVoice;
+import swingworkers.mediaactions.*;
+import swingworkers.merger.MergeAudioAndVideo;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.JFrame;
@@ -14,13 +16,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import add_mp3_file.MergeAudioAndVideo;
-import add_mp3_file.InvalidFilesCheck;
-import background_tasks.BackgroundVoice;
-import background_tasks.GetMediaFileDurationTask;
-import background_tasks.PlayMp3Background;
-import background_tasks.SkipBackground;
-import save_speech.SaveSpeechFrame;
+import utilities.errorhandlers.InvalidFilesCheck;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import java.awt.Toolkit;
@@ -50,11 +46,12 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 
-
+/**
+ * MediaPlayer is our main window that contains video and audio manipulating tools.
+ * User can use the tools on the UI to manipulate input videos with absolute flexibility.
+ */
 public class MediaPlayer extends JFrame implements ActionListener,ChangeListener {
-	/**
-	 * MediaPlayer is tool to manipulate videos and synthetic speeches.
-	 */
+	
 	// Icons were taken from Icongal.com
 	private final ImageIcon playIcon = new ImageIcon(
 			MediaPlayer.class.getResource("/javagui/resources/play.png"));
@@ -76,6 +73,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			MediaPlayer.class.getResource("/javagui/resources/tick48.png"));
 	private final ImageIcon addIcon = new ImageIcon(
 			MediaPlayer.class.getResource("/javagui/resources/Add.png"));
+	
 	//Panels
 	private final JPanel contentPane = new JPanel();;
 	private final JPanel screen = new JPanel();
@@ -160,8 +158,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 	private JFileChooser chooser = null;
 	
 	//comboboxes
-	private JComboBox<?> voiceOptions = new JComboBox();
-	private final JComboBox extensions = new JComboBox();
+	private JComboBox<String> voiceOptions = new JComboBox<String>();
+	private final JComboBox<String> extensions = new JComboBox<String>();
 	
 	//Checkboxes
 	private JCheckBox echoCheckBox = new JCheckBox("");
@@ -885,12 +883,16 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		}
 	}
 	
-	// play the Video
+	/**
+	 * start the video
+	 */
 	public void playVideo() {
 		video.playMedia(videoTitle);
 		video.start();
 	}
-	//Calculate time
+	/**
+	 * Calculate the video's timer from second to minute : second
+	 */
 	public void timeCalculator(){
 		if (((int) video.getTime() != -1)) {
 			if (second < 60) {
@@ -915,13 +917,18 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			time.setText("00:00");
 		}
 	}
+	
+	
 	// set the minute and second label to 0
 	public void setTime() {
 		this.second = 0;
 		this.minute = 0;
 	}
 	
-	// counts number of words in the text field
+	/**
+	 * Count the number of work in a string
+	 * @return
+	 */
 	public int wordCount() {
 		String speechText = text.getText().trim();
 		if (speechText.isEmpty())
@@ -929,14 +936,18 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		return speechText.split("\\s+").length; // separate string around spaces
 	}
 	
-	//Enable control button
+	/**
+	 * Enable control buttons when a video is selected
+	 */
 	public void enableButtons(){
 		play.setEnabled(true);
 		forward.setEnabled(true);
 		backward.setEnabled(true);
 	}
 	
-	//Enable effects
+	/**
+	 * Enable effects panels
+	 */
 	public void enableEffects(){
 		volumeSpnr.setEnabled(true);
 		tempoSpnr.setEnabled(true);
@@ -946,7 +957,10 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		stripCheckBox.setEnabled(true);
 		negateCheckBox.setEnabled(true);
 	}
-	//Disable Effects
+	
+	/**
+	 * Disable effects panels
+	 */
 	public void disableEffects(){
 		volumeSpnr.setEnabled(false);
 		tempoSpnr.setEnabled(false);
@@ -956,7 +970,11 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		stripCheckBox.setEnabled(false);
 		negateCheckBox.setEnabled(false);
 	}
-	//Get effects value
+	
+	/**
+	 * Get all effects from the effect panel
+	 * @return
+	 */
 	public ArrayList<Object> getEffects(){
 		ArrayList<Object> effects= new ArrayList<Object>();
 		effects.add(volumeSpnr.getValue());
@@ -979,7 +997,10 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 		
 	}
 	
-	//Jspinner translation
+	/**
+	 * Convert the spinners values from non-numeric to numeric.
+	 * @return
+	 */
 	private String[] spinnerTranslate(){
 		String[] pitch= new String[2];
 		String start= (String) startPitchSpnr.getValue();
@@ -1022,6 +1043,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			chooser = null;
 		}
 	}
+	
 	/**
 	 * Audio file chooser
 	 */

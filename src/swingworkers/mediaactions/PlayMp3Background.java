@@ -1,14 +1,14 @@
-package background_tasks;
+package swingworkers.mediaactions;
 
 import java.lang.reflect.Field;
 
 import javax.swing.SwingWorker;
 
-
+/**
+ * Play selected mp3 files in the background
+ */
 public class PlayMp3Background extends SwingWorker<Object,Integer>{
-	/**
-	 * Play selected mp3 files in the background
-	 */
+
 	private String fileName;
 	private int pid; 
 	/**
@@ -31,7 +31,7 @@ public class PlayMp3Background extends SwingWorker<Object,Integer>{
 		f.setAccessible(true);
 		// pid is private in UNIXProcess
 		this.pid= f.getInt(processPlay);
-		System.out.println(pid);
+		//System.out.println(pid);
 		processPlay.waitFor();
 		processPlay.destroy();
 		return null;

@@ -1,11 +1,10 @@
-package save_speech;
-import generic_frames.MessageFrame;
+package genericframes.helperframes;
 import java.awt.Color;
-import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
+import swingworkers.savesyntheticspeech.SaveSpeech;
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
@@ -15,12 +14,13 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
 
+/**
+ * SaveSpeechFrame is a helper frame which pop-up when user select to save entered text as synthetic speech.
+ * It contains few components, user can enter the name of the mp3 file and the directory to save that file to.
+ */
 public class SaveSpeechFrame extends JFrame implements ActionListener, WindowListener{
-	/**
-	 * SaveSpeechFrame let user enter a name for the mp3 file and also select the directory to save the mp3 file to.
-	 */
+	
 	private static String fileName="";
 	private static String folder="";
 	private JPanel contentPane= new JPanel();;
@@ -51,7 +51,10 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 	JFileChooser chooser = null;
 
 	/**
-	 * Create the frame.
+	 * Custom constructor
+	 * @param x
+	 * @param y
+	 * @param path
 	 */
 	public SaveSpeechFrame(int x, int y, String path) {
 		setProjectPath(path);

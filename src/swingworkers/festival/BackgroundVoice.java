@@ -1,4 +1,6 @@
-package background_tasks;
+package swingworkers.festival;
+
+import swingworkers.filesrehandlers.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,13 +12,14 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
-import mainview.MediaPlayer;
+import mediaplayer.MediaPlayer;
 
 /**
  * Creates a festival voice with voice, rate and pitch features specified by user. The voice can also be canceled
  * if use click the cancel button.
  */
 public class BackgroundVoice extends SwingWorker<Object, Integer> {
+	
 	// Instance variables
 	private ArrayList<String> filesToRemove= new ArrayList<String>();
 	private String message; // message to be said

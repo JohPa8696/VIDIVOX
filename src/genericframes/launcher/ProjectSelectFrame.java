@@ -1,4 +1,4 @@
-package generic_frames;
+package genericframes.launcher;
 
 
 import java.awt.Color;
@@ -21,13 +21,15 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
-import background_tasks.GlobalProjectFolder;
-import mainview.MediaPlayer;
+import swingworkers.filesrehandlers.GlobalProjectFolder;
+import mediaplayer.MediaPlayer;
 
+/**
+ * ProjectSelectFrame  is  the launcher which asks user for a project directory.
+ * User can create non-exist directory or select an exist one.
+ */
 public class ProjectSelectFrame extends JFrame implements ActionListener {
-	/**
-	 * ProjectSelectFrame asks user for a directory in which will be use as the global project folder.
-	 */
+	
 	private JPanel contentPane;
 	private JTextField directory;
 	private JLabel messagelbl;
@@ -39,25 +41,14 @@ public class ProjectSelectFrame extends JFrame implements ActionListener {
 	private JLabel gifLabel;
 	private String projectPath;
 	
+	//.gif file was extracted and scaled from sintel.mkv from open online source.
 	private final Icon intro = new ImageIcon(
 			MediaPlayer.class.getResource("/javagui/resources/intro.gif"));
+	
+	
 	/**
-	 * Launch the application.
+	 * Constructor
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ProjectSelectFrame pf = new ProjectSelectFrame();
-					pf.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
-	
 	public ProjectSelectFrame(){
 		//Set up Jframe
 		setTitle("VIDIVOX");
@@ -125,6 +116,9 @@ public class ProjectSelectFrame extends JFrame implements ActionListener {
 		contentPane.add(gifLabel);
 		
 	}
+	/**
+	 * Action listeners perform tasks when user clicked buttons on the window 
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == browse){

@@ -1,4 +1,4 @@
-package generic_frames;
+package genericframes.helperframes;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -11,19 +11,18 @@ import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-
 import java.awt.Font;
-
 import javax.swing.JButton;
 import javax.swing.border.EmptyBorder;
 
-import mainview.MediaPlayer;
+import mediaplayer.MediaPlayer;
 
+/**
+ * Options frame open a new window and let user choose the speed of the video
+ */
 public class OptionsFrame extends JFrame implements ActionListener {
 
-	/**
-	 * Options frame open a new window and let user choose the speed of the video
-	 */
+	
 	private JPanel contentPane= new JPanel();
 	private JLabel speedlbl = new JLabel("Speed");
 	private JButton halfRatebtn = new JButton("0.5");
@@ -31,22 +30,7 @@ public class OptionsFrame extends JFrame implements ActionListener {
 	private JButton doubleRatebtn = new JButton("2");
 	private JButton donebtn = new JButton("Done");
 	private MediaPlayer mediaPlayer=null;
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					//OptionsFrame window = new OptionsFrame();
-					//window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
+	
 	
 	/**
 	 * Constructor create the Option Frame
@@ -117,7 +101,10 @@ public class OptionsFrame extends JFrame implements ActionListener {
 		
 	}
 	
-	//Set mediaplayer
+	/**
+	 * set the local media player
+	 * @param mediaPlayer
+	 */
 	public void setMediaPlayer(MediaPlayer mediaPlayer){
 		this.mediaPlayer= mediaPlayer;
 	}
