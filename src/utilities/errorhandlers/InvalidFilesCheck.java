@@ -70,7 +70,6 @@ public class InvalidFilesCheck {
 		if (!video.exists() || video.isDirectory()
 				|| newFile.exists() || !directory.exists()
 				|| !checkFileName.getName().matches(pattern)) {
-
 			if (video.getName().equals("")|| newFile.getName().equals("")|| directory.getName().equals("")) {
 				if (mf != null) {
 					mf.dispose();
