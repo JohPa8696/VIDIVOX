@@ -31,12 +31,7 @@ public class PlayMp3Background extends SwingWorker<Object,Integer>{
 		ProcessBuilder buildPlay= new ProcessBuilder("/bin/bash","-c",cmdPlay);
 		Process processPlay= buildPlay.start();
 		
-		/*InputStream in = processPlay.getErrorStream();
-		BufferedReader bf= new BufferedReader(new InputStreamReader(in));
-		String line; 
-		while((line=bf.readLine())!=null){
-			System.out.println(line);
-		}*/
+		
 		//get the pid of the bash session
 		Field f = processPlay.getClass().getDeclaredField("pid");
 		f.setAccessible(true);
