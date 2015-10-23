@@ -738,7 +738,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				return;
 			}
 			
-			if(!text.getText().trim().equals("")){
+			if(!text.getText().trim().equals("")){ // Check user text inputs are valid
 				bg=null;
 				String[] pitch= spinnerTranslate();
 				String voice=(String)voiceOptions.getSelectedItem();
@@ -749,14 +749,14 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				}else{
 					voice="akl_nz_jdt_diphone";
 				}
-				bg = new BackgroundVoice(text.getText(),this,voice, 
+				bg = new BackgroundVoice(text.getText(),this,voice,                //Create the festival voice instance
 						(double)rateSpnr.getValue(), Integer.parseInt(pitch[0]),Integer.parseInt(pitch[1]));
 				bg.execute();
 				speak.setIcon(null);
 				speak.setText("Cancel");
 			}
 		} else if (e.getSource() == save) {			// Save the synthetic speech in an mp3 file
-			if (wordCount() > 30) {
+			if (wordCount() > 30) {                 //Check user inputs, the word count must be less than 30.
 				if (mf != null) {
 					mf.dispose();
 				}
@@ -775,7 +775,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			} else if (ssf != null) {
 				ssf.dispose();
 			}
-			ssf = new SaveSpeechFrame(getX(),getY(),projectPath);
+			ssf = new SaveSpeechFrame(getX(),getY(),projectPath);		//Open the Save Speech Frame, let use enter new file name and select save folder
 			ssf.setVisible(true);
 			String[] pitch= spinnerTranslate();
 			String voice=(String)voiceOptions.getSelectedItem();
@@ -800,11 +800,11 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				create.setText("Hide");
 			}
 		} else if(e.getSource() == videoBrowse){
-			videoFileChooser(videoBrowse);
-		}else if(e.getSource() == mp3Browse){
-			audioFileChooser();
+			videoFileChooser(videoBrowse);											//Open video browser
+		}else if(e.getSource() == mp3Browse){														
+			audioFileChooser();														//Open Audio browser
 		}else if(e.getSource() == dirBrowse){
-			directoryChooser();
+			directoryChooser();														//Open directory browser
 		}else if(e.getSource()== addToTable){
 			File file= new File(mp3Filetf.getText());
 			mp3FilesPaths.add(mp3Filetf.getText());
@@ -831,6 +831,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				mp3Files.add(mp3FilesPaths.get(i));
 				startTimes.add((String)table.getValueAt(i, 2));
 			}
+			
 			//Check if user have selected at least 1 video file
 			if(mp3Files.isEmpty()){
 				if (mf != null) {
@@ -841,6 +842,7 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 				mf.setVisible(true);
 				return;
 			}
+			
 			//Check if the inputs are valid
 			InvalidFilesCheck ifc1= new InvalidFilesCheck(videoFiletf.getText(),saveDirectory.getText()
 					+ System.getProperty("file.separator")+ newFileName.getText() + ".avi", saveDirectory.getText());
@@ -849,6 +851,8 @@ public class MediaPlayer extends JFrame implements ActionListener,ChangeListener
 			ifc2.setCoordinates(getX()+558,getY()+478);
 			InvalidFilesCheck ifc3= new InvalidFilesCheck(startTimes, videoDuration.getText());
 			ifc3.setCoordinates(getX()+558,getY()+478);
+			
+			// merge Audio And video when input are valid
 			if(!ifc1.ErrorChecking() || !ifc2.mp3FilesCheck() || !ifc3.startTimesCheck()){
 			}else{	
 				ArrayList<Object> effects=null;

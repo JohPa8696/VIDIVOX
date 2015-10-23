@@ -48,7 +48,7 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 	private JFrame thisFrame = this;
 	private JTextField saveTo= new JTextField();
 	private MessageFrame mf = null;
-	JFileChooser chooser = null;
+	private JFileChooser chooser = null;
 
 	/**
 	 * Custom constructor
@@ -57,8 +57,11 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 	 * @param path
 	 */
 	public SaveSpeechFrame(int x, int y, String path) {
+		//set project path
 		setProjectPath(path);
 		addWindowListener(this);
+		
+		//set up the frame
 		setTitle("Save Synthetic Speech");
 		setBounds(x+190, y+600, 510, 180);
 		setResizable(false);
@@ -113,7 +116,11 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 		contentPane.add(cancel);
 	}
 	
-	
+	/**
+	 * Perform tasks when user clicked buttons on the UI,
+	 * open the browser , save file or cancel
+	 * @param e
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
@@ -174,7 +181,7 @@ public class SaveSpeechFrame extends JFrame implements ActionListener, WindowLis
 		File tmpFile = new File(fileName);
 		File tmpDir = new File(folderName);
 					
-		// checks if file already exists
+		// checks if file already exists or file is a directory
 		if (tmpFile.exists() && !tmpFile.isDirectory()){
 			if(mf != null){
 				mf.dispose();

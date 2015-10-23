@@ -79,7 +79,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 		}
 		String cmdOutputFile="ffmpeg -y -i "+vidFile;
 		
-		//Build the commands to create mp3 files with start time length. Commands using aevalsrc filter
+		//Build the commands to create mp3 files with start time length. Commands are using aevalsrc filter
 		for(int i=0; i< mp3Files.size(); i++){
 			commands.add("ffmpeg -y -i "+mp3Files.get(i)+
 					" -filter_complex \"aevalsrc=0:d="+startTimesInSecond.get(i)+"[s1];[s1][0:a]concat=n=2:v=0:a=1[aout]\" -map [aout] "+ f+"/foo"+i+".mp3");
@@ -87,10 +87,10 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 			intermidiateFiles.add(f+"/foo"+i+".mp3");
 		}
 		
-		//Video effects
-		if(effects!=null){
-			if(vidFile.equals(f+"/tmp.avi")){
-				if(!(Boolean)effects.get(6)){
+		//Video Effects
+		if(effects!=null){							//Execute when effects are enabled 
+			if(vidFile.equals(f+"/tmp.avi")){		//if the audio from the original video is stripped then execute these codes
+				if(!(Boolean)effects.get(6)){		//if the video is negated then the command depends on the transpose options
 					if((Integer)effects.get(4)==4){
 						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
 					}else if((Integer)effects.get(4)==1 || (Integer)effects.get(4)==5){
@@ -99,7 +99,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf transpose=0 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
 					}
 					
-				}else if ( (Boolean)effects.get(6)){
+				}else if ( (Boolean)effects.get(6)){		//Transpose option + negate effect
 					if((Integer)effects.get(4)==4){
 						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf negate -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
 					}else if((Integer)effects.get(4)==1 || (Integer)effects.get(4)==5){
@@ -108,7 +108,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size())+" -vf negate,transpose=0 -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
 					}
 				}
-			}else{
+			}else{							// audio is not stripped then we have normal input audio streams
 				if(!(Boolean)effects.get(6)){
 					if((Integer)effects.get(4)==4){
 						cmdOutputFile= cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" -r "+(Integer)effects.get(3)+" "+f+"/tmp1.avi";
@@ -129,7 +129,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 				}
 			}
 			intermidiateFiles.add(f+"/tmp1.avi");
-		}else{
+		}else{								// If the effects are disable
 			cmdOutputFile=cmdOutputFile+" -filter_complex amix=inputs="+(mp3Files.size()+1)+" "+outputFile;
 		}
 		//Execute the mp3 files commands
@@ -149,6 +149,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 		
 		if(effects!=null){
 			int i=1;
+			//Rotation of 180 requires rotating the video 90 clockwise 2 time.
 			if((Integer)effects.get(4)==5){
 				String cmd180Flip= "ffmpeg -y -i "+f+"/tmp1.avi -vf transpose=1 "+f+"/tmp2.avi";
 				ProcessBuilder build180Flip= new ProcessBuilder("/bin/bash","-c", cmd180Flip);
@@ -165,6 +166,7 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 				process180Flip.destroy();
 			}
 			
+			//AudioEffects
 			String cmdAudioEffects;
 			if(!(Boolean)effects.get(2)){
 				cmdAudioEffects= "ffmpeg -y -i "+f+"/tmp"+i+".avi"+" -af volume="+(Double)effects.get(0)+",atempo="+(Double)effects.get(1)+ " " +outputFile;
@@ -199,9 +201,12 @@ public class MergeAudioAndVideo extends SwingWorker<Object,Integer> {
 	
 	@Override
 	protected void done(){
+		
+		//Update the status label in the mediaplayer
 		this.statuslbl.setText("Successfully created "+outputName.getName()+"!");
 		mediaPlayer.getProgressBar().setValue(500);
 		GetMediaFileDurationTask durationTask= new GetMediaFileDurationTask(outputFile,mediaPlayer.getVideoDurationLabel());
+		//Play the video when finish
 		if(playVideo){
 			video.playMedia(outputFile);
 			mediaPlayer.setVideoTitle(outputFile);

@@ -107,12 +107,14 @@ public class SaveSpeech extends SwingWorker<Object, Integer>{
 	
 	@Override
 	protected void process(List<Integer> chunks){
+		//Update status label and progressbar in media player 
 		String[] s= fileName.split("/");
 		this.statuslbl.setText("Creating "+s[s.length-1]+", please wait...");
 		progressBar.setValue(n);
 	}
 	@Override
 	protected void done(){
+		//Update status label and progressbar in media player when finished
 		String[] s= fileName.split("/");
 		this.statuslbl.setText("Sucessfully created "+s[s.length-1]+"!");
 		progressBar.setValue(500);

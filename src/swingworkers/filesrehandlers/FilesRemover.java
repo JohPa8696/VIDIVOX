@@ -21,6 +21,7 @@ public class FilesRemover extends SwingWorker<Object, Integer>{
 	
 	@Override
 	protected Object doInBackground() throws Exception {
+		//Remove files one by one
 		for(int i=0; i<filesToRemove.size(); i++){
 			String cmdRemove= "rm -f "+filesToRemove.get(i);
 			ProcessBuilder buildRemover= new ProcessBuilder("/bin/bash", "-c", cmdRemove);

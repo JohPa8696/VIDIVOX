@@ -85,8 +85,9 @@ public class OptionsFrame extends JFrame implements ActionListener {
 		setResizable(false);
 		setVisible(true);
 	}
-
-
+	/**
+	 * Set the rate of the video when user clicked button on the frame
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()== halfRatebtn){

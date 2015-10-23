@@ -69,34 +69,36 @@ public class InvalidFilesCheck {
 		if (newFile.getName().equals(".avi")|| !video.exists() || video.isDirectory()
 				|| newFile.exists() || !directory.exists()
 				|| !checkFileName.getName().matches(pattern)) {
+			
+			//Check for empty fields
 			if (newFile.getName().equals(".avi")|| newFile.getName().equals("")||checkFileName.getName().equals("")|| directory.getName().equals("")) {
 				if (mf != null) {
 					mf.dispose();
 				}
 				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 1",
 						"Please fill in blank fields");
-			} else if (!video.exists()) {
+			} else if (!video.exists()) {			// if the video does not exist
 				if (mf != null) {
 					mf.dispose();
 				}
 				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 2a", video.getName() + " does not exist");
-			} else if (video.isDirectory()) {
+			} else if (video.isDirectory()) {		// video file is a directory
 				if (mf != null) {
 					mf.dispose();
 				}
 				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 3a", video.getName() + " is a directory");
-			} else if (!directory.exists()) {
+			} else if (!directory.exists()) {		//DIrectory does not exist
 				if (mf != null) {
 					mf.dispose();
 				}
 				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 6", directory
 						.toString() + " does not exist");
-			} else if (newFile.exists()) {
+			} else if (newFile.exists()) {			// the name of new file is already taken
 				if (mf != null) {
 					mf.dispose();
 				}
 				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 5a", newFile.getName() + " already exists");
-			} else if (!checkFileName.getName().matches(pattern)) {
+			} else if (!checkFileName.getName().matches(pattern)) {			// name of new file contains invalid characters
 				if (mf != null) {
 					mf.dispose();
 				}
@@ -114,14 +116,15 @@ public class InvalidFilesCheck {
 	public boolean mp3FilesCheck(){
 		for(String s: mp3Files){
 			File mp3= new File(s);
-			if (mp3.isDirectory()) {
+			//Check mp3 files inputs	
+			if (mp3.isDirectory()) {		// mp3 file is a directory
 				if (mf != null) {
 				mf.dispose();
 				}
 				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 3b", mp3.getName() + " is a directory");
 				isValid2=false;
 				mf.setVisible(true);
-			} else if (!mp3.exists()) {
+			} else if (!mp3.exists()) {			//mp3 file foes not exist
 				if (mf != null) {
 					mf.dispose();
 				}	
@@ -137,10 +140,11 @@ public class InvalidFilesCheck {
 	 * @return
 	 */
 	public boolean startTimesCheck(){
+		//Check if the start time are valid, start time can not be greater than the video legnth
 		for (String s: startTimes){
 			String[] substrings=s.split(":");
 			for(String substring: substrings){
-				if(isInteger(substring)&&substring.length()==2){
+				if(isInteger(substring)&&substring.length()==2){		// the time should contain only numberic value and contains 2 digits number
 				}else{
 					if (mf != null) {
 						mf.dispose();
@@ -153,14 +157,14 @@ public class InvalidFilesCheck {
 			}
 			int min=Integer.parseInt(s.substring(0,2));
 			int sec=Integer.parseInt(s.substring(3,5));
-			if((min*60 +sec)>(minute*60+second)){
+			if((min*60 +sec)>(minute*60+second)){				// check if the input time is less than the video length
 				if (mf != null) {
 					mf.dispose();
 				}
 				mf = new MessageFrame(frameXCoord,frameYCoord,"Error", "ERROR 9", "Invalid start time");
 				isValid3=false;
 				mf.setVisible(true);
-			}else if (sec>=60){
+			}else if (sec>=60||min>=60){						// check if second and minute input are less than 60
 				if (mf != null) {
 					mf.dispose();
 				}

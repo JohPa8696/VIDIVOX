@@ -136,6 +136,7 @@ public class ProjectSelectFrame extends JFrame implements ActionListener {
 			}
 		}else if (e.getSource() == confirm){
 			
+			//Check if directory exists, if not ask user permission to create that directory
 			File file= new File(directory.getText());
 			if(!file.isDirectory()){
 				if (JOptionPane.showConfirmDialog(this,"The directory does not exist yet! Do you want to create it?", "Directory not Found",
@@ -146,15 +147,17 @@ public class ProjectSelectFrame extends JFrame implements ActionListener {
 					return;
 				}
 			}
+			//Set the project directory and close the launcher frame
 			projectPath= directory.getText();
 			this.dispose();
 			
+			//set look and feel feature for the GUI
 			try {
 				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e1) {
 				e1.printStackTrace();
 			}
-		
+			// Open media player when the project folder is ready
 			MediaPlayer mediaPlayer= new MediaPlayer(projectPath);
 			mediaPlayer.setVisible(true);
 		}
