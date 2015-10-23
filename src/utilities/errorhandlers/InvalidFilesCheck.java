@@ -35,7 +35,7 @@ public class InvalidFilesCheck {
 		this.videoFile=videoFile;
 		this.newFile=newFile;
 		this.directory=directory;
-		
+
 	}
 	/**
 	 * Contructor with input is array list of the selected mp3 files
@@ -65,12 +65,11 @@ public class InvalidFilesCheck {
 		File checkFileName=new File(this.newFile.substring(0, this.newFile.length()-4));
 		File directory = new File(this.directory);
 		String pattern = "^[a-zA-Z0-9_]*$";
-		
 		//checks that all fields are correct
-		if (!video.exists() || video.isDirectory()
+		if (newFile.getName().equals(".avi")|| !video.exists() || video.isDirectory()
 				|| newFile.exists() || !directory.exists()
 				|| !checkFileName.getName().matches(pattern)) {
-			if (video.getName().equals("")|| newFile.getName().equals("")|| directory.getName().equals("")) {
+			if (newFile.getName().equals(".avi")|| newFile.getName().equals("")||checkFileName.getName().equals("")|| directory.getName().equals("")) {
 				if (mf != null) {
 					mf.dispose();
 				}
