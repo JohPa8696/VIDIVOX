@@ -107,6 +107,7 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 				ProcessBuilder builder2 = new ProcessBuilder("/bin/bash", "-c",
 						"pstree -lp | grep " + pid);
 				Process process2 = builder2.start();
+				Thread.sleep(200);
 				InputStream stdout2 = process2.getInputStream();
 
 				// reads the output
@@ -127,11 +128,8 @@ public class BackgroundVoice extends SwingWorker<Object, Integer> {
 						"kill " + pidOfAplay);
 				builder3.start();
 				
-			} catch (IOException e) {
-				
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			} catch (IOException | InterruptedException e) {
+					e.getStackTrace();
 			}
 		} catch (InterruptedException e1) {
 		} catch (ExecutionException e1) {
